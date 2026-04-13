@@ -8,8 +8,8 @@
 import Foundation
 
 struct BskyProfile: Codable {
-    let did: String
-    let handle: String
+    let did: String?
+    let handle: String?
     let displayName: String?
     let description: String?
     let avatar: String?
@@ -19,6 +19,12 @@ struct BskyProfile: Codable {
     let postCount: Int?
     let indexedAt: Date?
     let createdAt: Date?
+    
+    let error: String?
+    let message: String?
+    var isError: Bool {
+        return error != nil
+    }
     
     var indexedAtIso8601: String {
         guard let indexedAt else { return "" }
@@ -31,6 +37,7 @@ struct BskyProfile: Codable {
     }
 
     /*
+     * other attributes
     let associated: ProfileAssociated?
     let joinedViaStarterPack: AppBskyGraphDefs.StarterPackViewBasic?
     let viewer: ViewerState?
