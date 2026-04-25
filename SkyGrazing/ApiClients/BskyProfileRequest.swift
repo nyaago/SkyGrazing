@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 struct BskyProfileRequest: BskyRequestable {
     
     typealias Response = BskyProfile

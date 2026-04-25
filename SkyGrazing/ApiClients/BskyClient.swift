@@ -6,13 +6,11 @@
 //
 
 import Foundation
-import Combine
 
 protocol BskyRequestable: Encodable {
     associatedtype Response: Decodable
     func endPoint() -> String
     func buildQueryItems() -> [URLQueryItem]
-//    func classType() -> Decodable.Type
 }
 
 protocol BskyPostable: Encodable {
@@ -20,28 +18,17 @@ protocol BskyPostable: Encodable {
     func endPoint() -> String
 }
 
-enum BskyError: Error {
-    case invalidResponse
-    case invalidData
-    case invalidURL
-    case unknown
-}
-
-enum BskyValidationError: Error {
-    
-}
-
 class BskyClient {
     private let baseURL = "https://bsky.social/xrpc/"
     
-    func fetch<R: BskyRequestable>(request: R, accessJwt: String?) -> AnyPublisher<R.Response, Error> {
+    func fetch<R: BskyRequestable>(request: R, accessJwt: String? = nil) async throws -> R.Response {
         var components = URLComponents(string: baseURL + request.endPoint())
         let queryItems = request.buildQueryItems()
         if !queryItems.isEmpty {
             components?.queryItems = queryItems
         }
         guard let url = components?.url else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
 
         var urlRequest = URLRequest(url: url)
@@ -49,27 +36,19 @@ class BskyClient {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
-        return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .handleEvents(receiveOutput: { output in
-                self.printJSON(from: output.data)
-                })
-            .map(\.data)
-            .decode(type: R.Response.self, decoder: JSONDecoder()) // 強制キャスト不要
-            .mapError({ error in
-                self.printError(from: error)
-                return error
-            })
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        printJSON(from: data)
+        do {
+            return try JSONDecoder().decode(R.Response.self, from: data)
+        } catch {
+            printError(from: error)
+            throw error
+        }
     }
     
-    func post<R: BskyPostable>(request: R) -> AnyPublisher<R.Response, Error> {
-        post(request: request, accessJwt: nil)
-    }
-    
-    func post<R: BskyPostable>(request: R, accessJwt: String?) -> AnyPublisher<R.Response, Error> {
+    func post<R: BskyPostable>(request: R, accessJwt: String? = nil) async throws -> R.Response {
         guard let url = URL(string: baseURL + request.endPoint()) else {
-            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+            throw URLError(.badURL)
         }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
@@ -77,24 +56,16 @@ class BskyClient {
         if let token = accessJwt {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
-        do {
-            urlRequest.httpBody = try JSONEncoder().encode(request)
-        } catch {
-            return Fail(error: error).eraseToAnyPublisher()
-        }
+        urlRequest.httpBody = try JSONEncoder().encode(request)
         
-        return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .handleEvents(receiveOutput: { output in
-                self.printJSON(from: output.data)
-            })
-            .map(\.data)
-            .decode(type: R.Response.self, decoder: JSONDecoder())
-            .mapError { error in
-                self.printError(from: error)
-                return error
-            }
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        printJSON(from: data)
+        do {
+            return try JSONDecoder().decode(R.Response.self, from: data)
+        } catch {
+            printError(from: error)
+            throw error
+        }
     }
     
     private func printJSON(from data: Data) {
