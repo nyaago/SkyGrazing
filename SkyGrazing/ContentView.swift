@@ -14,7 +14,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            ProfileView(handle: "nyaago.bsky.social")
+            EmptyView()
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
@@ -26,7 +26,8 @@ struct ContentView: View {
                 }
             }
         } detail: {
-            Text("Select an item")
+            ProfileView(handle: "nyaago.bsky.social")
+            
         }
     }
 

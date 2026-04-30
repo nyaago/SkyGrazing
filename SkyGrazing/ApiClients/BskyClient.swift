@@ -21,7 +21,7 @@ protocol BskyPostable: Encodable {
 class BskyClient {
     private let baseURL = "https://bsky.social/xrpc/"
     
-    func fetch<R: BskyRequestable>(request: R, accessJwt: String? = nil) async throws -> R.Response {
+    func fetch<R: BskyRequestable>(request: R) async throws -> R.Response {
         var components = URLComponents(string: baseURL + request.endPoint())
         let queryItems = request.buildQueryItems()
         if !queryItems.isEmpty {
@@ -32,28 +32,31 @@ class BskyClient {
         }
 
         var urlRequest = URLRequest(url: url)
-        if let token = accessJwt {
+        if let token = accessToken {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
         let (data, _) = try await URLSession.shared.data(for: urlRequest)
         printJSON(from: data)
         do {
-            return try JSONDecoder().decode(R.Response.self, from: data)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            
+            return try decoder.decode(R.Response.self, from: data)
         } catch {
             printError(from: error)
             throw error
         }
     }
     
-    func post<R: BskyPostable>(request: R, accessJwt: String? = nil) async throws -> R.Response {
+    func post<R: BskyPostable>(request: R) async throws -> R.Response {
         guard let url = URL(string: baseURL + request.endPoint()) else {
             throw URLError(.badURL)
         }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let token = accessJwt {
+        if let token = accessToken {
             urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         urlRequest.httpBody = try JSONEncoder().encode(request)
@@ -94,5 +97,9 @@ class BskyClient {
                 }
             }
         print("-----------------")
-    }   
+    }
+    
+    var accessToken: String? {
+        return AppProperty().getString("ApiKey")
+    }
 }
