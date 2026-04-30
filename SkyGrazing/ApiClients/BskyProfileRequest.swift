@@ -10,10 +10,10 @@ struct BskyProfileRequest: BskyRequestable {
     
     typealias Response = BskyProfile
         
-    let handle: String
+    let actor: String
     
     func buildQueryItems() -> [URLQueryItem] {
-        [URLQueryItem(name: "actor", value: handle)]
+        [URLQueryItem(name: "actor", value: actor)]
     }
  
     func endPoint() -> String {

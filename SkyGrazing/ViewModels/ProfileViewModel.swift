@@ -18,17 +18,17 @@ class ProfileViewModel: ObservableObject {
         
         Task {
             defer { isLoading = false }
-            let request = BskyProfileRequest(handle: handle)
+            let request = BskyProfilesRequest(actors: [handle])
             let client = BskyClient()
             do {
-                let profile = try await client.fetch(request: request)
-                if profile.isError {
-                    let error = profile.error ?? "Unknown Error"
-                    let message = profile.message ?? "Unknown Message"
+                let profiles = try await client.fetch(request: request)
+                if profiles.isError {
+                    let error = profiles.error ?? "Unknown Error"
+                    let message = profiles.message ?? "Unknown Message"
                     print("error:\(error) ")
                     print("message:\(message)")
                 }
-                self.profile = profile
+                self.profile = profiles.profiles.first
             } catch {
                 print("error: \(error)")
             }
