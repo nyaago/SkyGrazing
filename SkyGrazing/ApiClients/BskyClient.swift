@@ -37,14 +37,18 @@ class BskyClient {
         }
         
         let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        #if DEBUG
         printJSON(from: data)
+        #endif
         do {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             
             return try decoder.decode(R.Response.self, from: data)
         } catch {
+            #if DEBUG
             printError(from: error)
+            #endif
             throw error
         }
     }
@@ -62,15 +66,20 @@ class BskyClient {
         urlRequest.httpBody = try JSONEncoder().encode(request)
         
         let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        #if DEBUG
         printJSON(from: data)
+        #endif
         do {
             return try JSONDecoder().decode(R.Response.self, from: data)
         } catch {
+            #if DEBUG
             printError(from: error)
+            #endif
             throw error
         }
     }
     
+    #if DEBUG
     private func printJSON(from data: Data) {
         if let jsonString = String(data: data, encoding: .utf8) {
             print("--- API Response JSON ---")
@@ -98,6 +107,7 @@ class BskyClient {
             }
         print("-----------------")
     }
+    #endif
     
     private static let accessTokenKey = "accessJwt"
     private static let refreshTokenKey = "refreshJwt"
