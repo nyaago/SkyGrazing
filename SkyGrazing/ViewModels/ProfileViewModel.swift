@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Observation
 
-class ProfileViewModel: ObservableObject {
-    @Published var profile: BskyProfile?
-    @Published var isLoading = false
+@Observable
+class ProfileViewModel {
+    var profile: BskyProfile?
+    var isLoading = false
     
     @MainActor
     func onAppear(handle: String) {
