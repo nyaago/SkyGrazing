@@ -9,7 +9,7 @@ import Foundation
 
 // https://docs.bsky.app/docs/api/app-bsky-actor-get-profiles
 
-struct BskyProfiles: Codable {
+struct BskyProfiles: Codable, BskyResponseCheckable {
     let profiles: [BskyProfile]
 
     let error: String?

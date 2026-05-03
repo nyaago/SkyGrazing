@@ -9,7 +9,7 @@
 
 import Foundation
 
-struct BskyProfile: Codable {
+struct BskyProfile: Codable, BskyResponseCheckable {
     // required
     let did: String
     let handle: String

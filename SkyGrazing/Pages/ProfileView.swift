@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Environment(BskyService.self) private var service
     @State private var viewModel = ProfileViewModel()
     let handle: String
     
@@ -17,14 +18,15 @@ struct ProfileView: View {
                 Text(profile.displayName ?? handle)
                     .font(.largeTitle)
                 Text(profile.description ?? "")
-            } else if viewModel.isLoading {
+            } else if service.isLoading {
                 ProgressView()
             }
         }
-        .onAppear { viewModel.onAppear(handle: handle) }
+        .onAppear { viewModel.onAppear(handle: handle, service: service) }
     }
 }
 
 #Preview {
     ProfileView(handle: "nyaago.bsky.social")
+        .environment(BskyService())
 }

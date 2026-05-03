@@ -18,6 +18,12 @@ protocol BskyPostable: Encodable {
     func endPoint() -> String
 }
 
+protocol BskyResponseCheckable {
+    var error: String? { get }
+    var message: String? { get }
+    var isError: Bool { get }
+}
+
 class BskyClient {
     private let baseURL = "https://bsky.social/xrpc/"
     

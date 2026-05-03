@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct SkyGrazingApp: App {
+    @State private var bskyService = BskyService()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -26,6 +28,7 @@ struct SkyGrazingApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(bskyService)
         }
         .modelContainer(sharedModelContainer)
     }

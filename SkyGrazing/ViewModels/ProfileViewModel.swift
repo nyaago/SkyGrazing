@@ -11,27 +11,27 @@ import Observation
 @Observable
 class ProfileViewModel {
     var profile: BskyProfile?
-    var isLoading = false
     
     @MainActor
-    func onAppear(handle: String) {
-        guard !isLoading else { return }
-        isLoading = true
+    func onAppear(handle: String, service: BskyService) {
+        guard !service.isLoading else { return }
+        service.isLoading = true
         
         Task {
-            defer { isLoading = false }
+            defer { service.isLoading = false }
             let request = BskyProfileRequest(actor: handle)
-            let client = BskyClient()
             do {
-                let _ = try await client.login()
-                let profile = try await client.fetch(request: request)
-                if profile.isError {
-                    let error = profile.error ?? "Unknown Error"
-                    let message = profile.message ?? "Unknown Message"
-                    print("error:\(error) ")
-                    print("message:\(message)")
-                }
-                self.profile = profile
+                self.profile = try await service.fetch(request)
+                // TODO エラー時の UI の処理
+                /*
+                 } catch let error as BskyApiError {
+                 switch error {
+                 case .apiError(let error, let message):
+                 print("API error: \(error) - \(message)")
+                 }
+                 
+                 }
+                 */
             } catch {
                 print("error: \(error)")
             }
