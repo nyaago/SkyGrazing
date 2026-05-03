@@ -23,6 +23,7 @@ class ProfileViewModel {
             let request = BskyProfilesRequest(actors: [handle])
             let client = BskyClient()
             do {
+                let _ = try await client.login()
                 let profiles = try await client.fetch(request: request)
                 if profiles.isError {
                     let error = profiles.error ?? "Unknown Error"
