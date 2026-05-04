@@ -10,24 +10,28 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(BskyService.self) private var service
     @Query private var items: [Item]
 
     var body: some View {
-        NavigationSplitView {
-            EmptyView()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+        if service.isLoggedIn {
+            NavigationSplitView {
+                EmptyView()
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
+                    }
+                    ToolbarItem {
+                        Button(action: addItem) {
+                            Label("Add Item", systemImage: "plus")
+                        }
                     }
                 }
+            } detail: {
+                ProfileView(handle: "nyaago.bsky.social")
             }
-        } detail: {
-            ProfileView(handle: "nyaago.bsky.social")
-            
+        } else {
+            LoginView()
         }
     }
 

@@ -15,6 +15,7 @@ enum BskyApiError: Error {
 @Observable
 class BskyService {
     var isLoading = false
+    var isLoggedIn = false
     private let client = BskyClient()
     
     /// 認証済みでなければログインし、GETリクエストを実行する
@@ -35,9 +36,16 @@ class BskyService {
         return response
     }
     
+    /// UI から identifier/password でログインする
+    func login(identifier: String, password: String) async throws {
+        let _ = try await client.login(identifier: identifier, password: password)
+        isLoggedIn = true
+    }
+
     private func ensureLoggedIn() async throws {
         if client.accessToken == nil {
             let _ = try await client.login()
+            isLoggedIn = true
         }
     }
     

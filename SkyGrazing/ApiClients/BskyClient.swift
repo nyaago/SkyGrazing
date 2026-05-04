@@ -117,7 +117,9 @@ class BskyClient {
     
     private static let accessTokenKey = "accessJwt"
     private static let refreshTokenKey = "refreshJwt"
-    
+    private static let appAccessTokenKey = "appAccessJwt"
+    private static let appRefreshTokenKey = "appRefreshJwt"
+
     /// Plist の identifier/password で createSession を呼び、トークンを Keychain に保存する
     func login() async throws -> BskySession {
         let appProperty = AppProperty()
@@ -125,13 +127,18 @@ class BskyClient {
               let password = appProperty.getString("BskyPassword") else {
             throw URLError(.userAuthenticationRequired)
         }
+        return try await login(identifier: identifier, password: password)
+    }
+
+    /// 指定された identifier/password で createSession を呼び、トークンを Keychain に保存する
+    func login(identifier: String, password: String) async throws -> BskySession {
         let request = BskyCreateSessionRequest(identifier: identifier, password: password)
         let session = try await post(request: request)
         KeychainHelper.save(key: Self.accessTokenKey, value: session.accessJwt)
         KeychainHelper.save(key: Self.refreshTokenKey, value: session.refreshJwt)
         return session
     }
-    
+   
     var accessToken: String? {
         KeychainHelper.load(key: Self.accessTokenKey)
     }
