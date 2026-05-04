@@ -9,8 +9,8 @@ import SwiftUI
 
 struct LoginView: View {
     @Environment(BskyService.self) private var service
-    @State private var identifier = ""
-    @State private var password = ""
+    @State private var identifier = AppProperty().getString("BskyIdentifier") ?? ""
+    @State private var password = AppProperty().getString("BskyPassword") ?? ""
     @State private var errorMessage: String?
 
     var body: some View {
