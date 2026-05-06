@@ -39,9 +39,9 @@ struct LoginView: View {
                 login()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(identifier.isEmpty || password.isEmpty || service.isLoading)
+            .disabled(identifier.isEmpty || password.isEmpty || service.isLoggingIn)
 
-            if service.isLoading {
+            if service.isLoggingIn {
                 ProgressView()
             }
         }
@@ -50,10 +50,10 @@ struct LoginView: View {
 
     private func login() {
         errorMessage = nil
-        service.isLoading = true
+        service.isLoggingIn = true
 
         Task {
-            defer { service.isLoading = false }
+            defer { service.isLoggingIn = false }
             do {
                 try await service.login(identifier: identifier, password: password)
             } catch {

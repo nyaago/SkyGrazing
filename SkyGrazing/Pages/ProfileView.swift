@@ -18,7 +18,7 @@ struct ProfileView: View {
                 Text(profile.displayName ?? handle)
                     .font(.largeTitle)
                 Text(profile.description ?? "")
-            } else if service.isLoading {
+            } else if viewModel.isLoading {
                 ProgressView()
             }
         }

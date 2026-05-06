@@ -14,14 +14,13 @@ enum BskyApiError: Error {
 
 @Observable
 class BskyService {
-    var isLoading = false
     var isLoggedIn = false
+    var isLoggingIn = false
     private let client = BskyClient()
     
     /// 認証済みでなければログインし、GETリクエストを実行する
     func fetch<R: BskyRequestable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
-        try await ensureLoggedIn()
         let response = try await client.fetch(request: request)
         try checkResponse(response)
         return response
@@ -30,7 +29,6 @@ class BskyService {
     /// 認証済みでなければログインし、POSTリクエストを実行する
     func post<R: BskyPostable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
-        try await ensureLoggedIn()
         let response = try await client.post(request: request)
         try checkResponse(response)
         return response
@@ -40,13 +38,6 @@ class BskyService {
     func login(identifier: String, password: String) async throws {
         let _ = try await client.login(identifier: identifier, password: password)
         isLoggedIn = true
-    }
-
-    private func ensureLoggedIn() async throws {
-        if client.accessToken == nil {
-            let _ = try await client.login()
-            isLoggedIn = true
-        }
     }
     
     private func checkResponse(_ response: BskyResponseCheckable) throws {

@@ -10,15 +10,16 @@ import Observation
 
 @Observable
 class ProfileViewModel {
+    var isLoading = false
     var profile: BskyProfile?
     
     @MainActor
     func onAppear(handle: String, service: BskyService) {
-        guard !service.isLoading else { return }
-        service.isLoading = true
+        guard !isLoading else { return }
+        isLoading = true
         
         Task {
-            defer { service.isLoading = false }
+            defer { isLoading = false }
             let request = BskyProfileRequest(actor: handle)
             do {
                 self.profile = try await service.fetch(request)
