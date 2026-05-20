@@ -136,6 +136,7 @@ class BskyClient {
         let session = try await post(request: request)
         KeychainHelper.save(key: Self.accessTokenKey, value: session.accessJwt)
         KeychainHelper.save(key: Self.refreshTokenKey, value: session.refreshJwt)
+        UserSettings.handle = session.handle
         return session
     }
    

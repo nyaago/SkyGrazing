@@ -28,7 +28,7 @@ struct ContentView: View {
                     }
                 }
             } detail: {
-                ProfileView(handle: "nyaago.bsky.social")
+                ProfileView()
             }
         } else {
             LoginView()

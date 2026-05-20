@@ -10,23 +10,22 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel = ProfileViewModel()
-    let handle: String
     
     var body: some View {
         VStack {
             if let profile = viewModel.profile {
-                Text(profile.displayName ?? handle)
+                Text(profile.displayName ?? UserSettings.handle)
                     .font(.largeTitle)
                 Text(profile.description ?? "")
             } else if viewModel.isLoading {
                 ProgressView()
             }
         }
-        .onAppear { viewModel.onAppear(handle: handle, service: service) }
+        .onAppear { viewModel.onAppear(handle: UserSettings.handle, service: service) }
     }
 }
 
 #Preview {
-    ProfileView(handle: "nyaago.bsky.social")
+    ProfileView()
         .environment(BskyService())
 }

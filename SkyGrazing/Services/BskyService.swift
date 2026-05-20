@@ -18,7 +18,7 @@ class BskyService {
     var isLoggingIn = false
     private let client = BskyClient()
     
-    /// 認証済みでなければログインし、GETリクエストを実行する
+    /// GETリクエストを実行する
     func fetch<R: BskyRequestable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
         let response = try await client.fetch(request: request)
@@ -26,7 +26,7 @@ class BskyService {
         return response
     }
     
-    /// 認証済みでなければログインし、POSTリクエストを実行する
+    /// POSTリクエストを実行する
     func post<R: BskyPostable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
         let response = try await client.post(request: request)
