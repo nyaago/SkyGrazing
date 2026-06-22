@@ -13,4 +13,5 @@ protocol FeedViewModelProtocol: Observable, AnyObject {
     var isLoading: Bool { get }
     var feedPosts: [BskyFeedViewPost] { get }
     func onAppear(service: BskyService)
+    func loadMore(service: BskyService)
 }

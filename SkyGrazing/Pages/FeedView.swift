@@ -32,14 +32,26 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                     .font(.body)
             }
             .padding(.vertical, 4)
+            .onAppear {
+                if isNearBottom(feedPost) {
+                    viewModel.loadMore(service: service)
+                }
+            }
         }
         .listStyle(.plain)
         .overlay {
-            if viewModel.isLoading {
+            if viewModel.isLoading && viewModel.feedPosts.isEmpty {
                 ProgressView()
             }
         }
         .onAppear { viewModel.onAppear(service: service) }
+    }
+
+    private func isNearBottom(_ feedPost: BskyFeedViewPost) -> Bool {
+        guard let index = viewModel.feedPosts.firstIndex(where: { $0.post.cid == feedPost.post.cid }) else {
+            return false
+        }
+        return index >= viewModel.feedPosts.count - 3
     }
 }
 
