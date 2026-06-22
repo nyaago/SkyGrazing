@@ -9,7 +9,7 @@ import Foundation
 import Observation
 
 @Observable
-class TimelineViewModel {
+class TimelineViewModel: FeedViewModelProtocol {
     var isLoading = false
     var feedPosts: [BskyFeedViewPost] = []
 
