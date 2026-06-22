@@ -14,6 +14,7 @@ class TimelineViewModel: FeedViewModelProtocol {
     var feedPosts: [BskyFeedViewPost] = []
     private var cursor: String?
     private var hasMore = true
+    private var pollingTask: Task<Void, Never>?
 
     @MainActor
     func onAppear(service: BskyService) {
@@ -32,6 +33,14 @@ class TimelineViewModel: FeedViewModelProtocol {
                 print("error: \(error)")
             }
         }
+
+        startPolling(service: service)
+    }
+
+    @MainActor
+    func onDisappear() {
+        pollingTask?.cancel()
+        pollingTask = nil
     }
 
     @MainActor
@@ -49,6 +58,33 @@ class TimelineViewModel: FeedViewModelProtocol {
                 self.hasMore = timeline.cursor != nil
             } catch {
                 print("error: \(error)")
+            }
+        }
+    }
+
+    @MainActor
+    private func startPolling(service: BskyService) {
+        pollingTask?.cancel()
+        pollingTask = Task {
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(60))
+                } catch {
+                    break
+                }
+                guard !Task.isCancelled, !isLoading else { continue }
+                let request = BskyTimelineRequest(limit: 20)
+                do {
+                    let timeline = try await service.fetch(request)
+                    let newPosts = (timeline.feed ?? []).filter { newPost in
+                        !self.feedPosts.contains(where: { $0.post.cid == newPost.post.cid })
+                    }
+                    if !newPosts.isEmpty {
+                        self.feedPosts.insert(contentsOf: newPosts, at: 0)
+                    }
+                } catch {
+                    print("polling error: \(error)")
+                }
             }
         }
     }

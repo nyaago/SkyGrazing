@@ -45,6 +45,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             }
         }
         .onAppear { viewModel.onAppear(service: service) }
+        .onDisappear { viewModel.onDisappear() }
     }
 
     private func isNearBottom(_ feedPost: BskyFeedViewPost) -> Bool {
