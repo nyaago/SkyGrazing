@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct TimelineView: View {
+    @State var router: TimelineRouter = .init()
+    
     var body: some View {
-        FeedView(viewModel: TimelineViewModel())
-            .navigationTitle("Timeline")
+        NavigationStack(path: $router.path) {
+            FeedView(viewModel: TimelineViewModel())
+                .navigationTitle("Timeline")
+
+        }
+        .environment(router)
     }
 }
 

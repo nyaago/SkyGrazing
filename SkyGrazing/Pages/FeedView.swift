@@ -10,7 +10,8 @@ import SwiftUI
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel: ViewModel
-
+    @Environment(TimelineRouter.self) private var router
+    
     init(viewModel: ViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
@@ -19,8 +20,15 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         List(viewModel.feedPosts, id: \.post.cid) { feedPost in
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
+                    Button {
+                        print("push: \(feedPost.post.author)")
+                        router.push(.profile(feedPost.post.author))
+                    } label: {
+                        Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
                         .font(.headline)
+                    }
+                     Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
+                     .font(.headline)
                     Spacer()
                     if let createdAt = feedPost.post.record.createdAt {
                         Text(createdAt)
@@ -28,8 +36,13 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                Text(feedPost.post.record.text ?? "")
-                    .font(.body)
+                Button {
+                    print("push: \(feedPost.post.cid)")
+                    router.push(.post(feedPost.post))
+                } label: {
+                    Text(feedPost.post.record.text ?? "")
+                       .font(.body)
+                }
             }
             .padding(.vertical, 4)
             .onAppear {

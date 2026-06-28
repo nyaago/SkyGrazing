@@ -31,7 +31,7 @@ struct BskyFeedViewPost: Codable {
 
 // MARK: - app.bsky.feed.defs#postView
 
-struct BskyPostView: Codable {
+struct BskyPostView: Codable, Hashable {
     let uri: String
     let cid: String
     let author: BskyProfileViewBasic
@@ -42,6 +42,14 @@ struct BskyPostView: Codable {
     let quoteCount: Int?
     let indexedAt: String?
     let labels: [BskyLabel]?
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(cid)
+    }
+
+    static func == (lhs: BskyPostView, rhs: BskyPostView) -> Bool {
+        lhs.cid == rhs.cid
+    }
 }
 
 // MARK: - app.bsky.feed.post (record)

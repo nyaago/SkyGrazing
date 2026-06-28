@@ -96,7 +96,7 @@ struct BskyKnownFollowers: Codable {
  
 // MARK: - app.bsky.actor.defs#profileViewBasic
  
-struct BskyProfileViewBasic: Codable {
+struct BskyProfileViewBasic: Codable, Hashable {
     let did: String
     let handle: String
     let displayName: String?
@@ -105,6 +105,14 @@ struct BskyProfileViewBasic: Codable {
     let viewer: BskyViewerState?
     let labels: [BskyLabel]?
     let createdAt: String?
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(did)
+    }
+
+    static func == (lhs: BskyProfileViewBasic, rhs: BskyProfileViewBasic) -> Bool {
+        lhs.did == rhs.did
+    }
 }
  
 // MARK: - app.bsky.graph.defs#listViewBasic
