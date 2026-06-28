@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>BskyIdentifier</key>
-	<string>your-handle.bsky.social</string>
+	<string>nyaago.bsky.social</string>
 	<key>BskyPassword</key>
-	<string>your-app-password</string>
+	<string>REPLACE_WITH_YOUR_PASSWORD</string>
 </dict>
 </plist>
