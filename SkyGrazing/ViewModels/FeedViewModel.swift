@@ -1,15 +1,17 @@
 //
-//  TimelineViewModel.swift
+//  FeedViewModel.swift
 //  SkyGrazing
 //
-//  Created by nyaago on 2026/06/20.
+//  Created by nyaago on 2026/06/28.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class TimelineViewModel: FeedViewModelProtocol {
+class FeedViewModel<Request: BskyRequestable>: FeedViewModelProtocol
+    where Request.Response == BskyTimeline {
+
     var isLoading = false
     var feedPosts: [BskyFeedViewPost] = []
     private var cursor: String?
@@ -22,7 +24,13 @@ class TimelineViewModel: FeedViewModelProtocol {
     private var limit: Int = 50
     private var moreLimit: Int = 30
     private var autoPolling: Bool = true
-    
+
+    private let makeRequest: (_ limit: Int?, _ cursor: String?) -> Request
+
+    init(makeRequest: @escaping (_ limit: Int?, _ cursor: String?) -> Request) {
+        self.makeRequest = makeRequest
+    }
+
     @MainActor
     func onAppear(service: BskyService) {
         guard !isLoading else { return }
@@ -30,7 +38,7 @@ class TimelineViewModel: FeedViewModelProtocol {
 
         Task {
             defer { isLoading = false }
-            let request = BskyTimelineRequest(limit: limit)
+            let request = makeRequest(limit, nil)
             do {
                 let timeline = try await service.fetch(request)
                 self.feedPosts = timeline.feed ?? []
@@ -58,7 +66,7 @@ class TimelineViewModel: FeedViewModelProtocol {
 
         Task {
             defer { isLoading = false }
-            let request = BskyTimelineRequest(limit: moreLimit, cursor: cursor)
+            let request = makeRequest(moreLimit, cursor)
             do {
                 let timeline = try await service.fetch(request)
                 self.feedPosts.append(contentsOf: timeline.feed ?? [])
@@ -82,7 +90,7 @@ class TimelineViewModel: FeedViewModelProtocol {
                     break
                 }
                 guard !Task.isCancelled, !isLoading else { continue }
-                let request = BskyTimelineRequest(limit: limit)
+                let request = makeRequest(limit, nil)
                 do {
                     moreNewPostsExist = false
                     let timeline = try await service.fetch(request)

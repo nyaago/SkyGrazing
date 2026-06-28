@@ -71,7 +71,9 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
 
 #Preview {
     NavigationStack {
-        FeedView(viewModel: TimelineViewModel())
+        FeedView(viewModel: FeedViewModel { limit, cursor in
+            BskyTimelineRequest(limit: limit, cursor: cursor)
+        })
     }
     .environment(BskyService())
 }

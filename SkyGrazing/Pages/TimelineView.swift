@@ -12,7 +12,9 @@ struct TimelineView: View {
     
     var body: some View {
         NavigationStack(path: $router.path) {
-            FeedView(viewModel: TimelineViewModel())
+            FeedView(viewModel: FeedViewModel { limit, cursor in
+                    BskyTimelineRequest(limit: limit, cursor: cursor)
+                })
                 .navigationTitle("Timeline")
 
         }
