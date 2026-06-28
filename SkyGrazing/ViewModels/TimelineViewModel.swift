@@ -16,6 +16,13 @@ class TimelineViewModel: FeedViewModelProtocol {
     private var hasMore = true
     private var pollingTask: Task<Void, Never>?
 
+    private var moreNewPostsExist: Bool = false
+
+    private var secondToPolling: Int = 120
+    private var limit: Int = 50
+    private var moreLimit: Int = 30
+    private var autoPolling: Bool = true
+    
     @MainActor
     func onAppear(service: BskyService) {
         guard !isLoading else { return }
@@ -23,7 +30,7 @@ class TimelineViewModel: FeedViewModelProtocol {
 
         Task {
             defer { isLoading = false }
-            let request = BskyTimelineRequest(limit: 20)
+            let request = BskyTimelineRequest(limit: limit)
             do {
                 let timeline = try await service.fetch(request)
                 self.feedPosts = timeline.feed ?? []
@@ -33,8 +40,9 @@ class TimelineViewModel: FeedViewModelProtocol {
                 print("error: \(error)")
             }
         }
-
-        startPolling(service: service)
+        if autoPolling {
+            startPolling(service: service)
+        }
     }
 
     @MainActor
@@ -50,7 +58,7 @@ class TimelineViewModel: FeedViewModelProtocol {
 
         Task {
             defer { isLoading = false }
-            let request = BskyTimelineRequest(limit: 20, cursor: cursor)
+            let request = BskyTimelineRequest(limit: moreLimit, cursor: cursor)
             do {
                 let timeline = try await service.fetch(request)
                 self.feedPosts.append(contentsOf: timeline.feed ?? [])
@@ -62,19 +70,21 @@ class TimelineViewModel: FeedViewModelProtocol {
         }
     }
 
+    // TODO 自動polling はやめて scroll で取りに行く、新しいpost の有無は監視して通知させるか?
     @MainActor
     private func startPolling(service: BskyService) {
         pollingTask?.cancel()
         pollingTask = Task {
             while !Task.isCancelled {
                 do {
-                    try await Task.sleep(for: .seconds(60))
+                    try await Task.sleep(for: .seconds(secondToPolling))
                 } catch {
                     break
                 }
                 guard !Task.isCancelled, !isLoading else { continue }
-                let request = BskyTimelineRequest(limit: 20)
+                let request = BskyTimelineRequest(limit: limit)
                 do {
+                    moreNewPostsExist = false
                     let timeline = try await service.fetch(request)
                     let newPosts = (timeline.feed ?? []).filter { newPost in
                         !self.feedPosts.contains(where: { $0.post.cid == newPost.post.cid })
@@ -82,6 +92,9 @@ class TimelineViewModel: FeedViewModelProtocol {
                     if !newPosts.isEmpty {
                         self.feedPosts.insert(contentsOf: newPosts, at: 0)
                     }
+                    moreNewPostsExist = (timeline.feed ?? []).filter { newPost in
+                        !self.feedPosts.contains(where: { $0.post.cid == newPost.post.cid })
+                    }.isEmpty == false
                 } catch {
                     print("polling error: \(error)")
                 }
