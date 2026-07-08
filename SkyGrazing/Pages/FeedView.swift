@@ -20,34 +20,11 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         List(viewModel.feedPosts, id: \.post.cid) { feedPost in
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Button {
-                        print("push: \(feedPost.post.author)")
-                        router.push(.profile(feedPost.post.author))
-                    } label: {
-                        Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
-                        .font(.headline)
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.vertical, 4)
-                     Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
-                     .font(.headline)
+                    authorButton(feedPost)
                     Spacer()
-                    if let createdAt = feedPost.post.record.createdAt {
-                        Text(createdAt)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    createdAt(feedPost)
                 }
-                VStack(alignment: .leading, spacing: 4) {
-                    Button {
-                        print("push: \(feedPost.post.cid)")
-                        router.push(.post(feedPost.post))
-                    } label: {
-                        Text(feedPost.post.record.text ?? "")
-                            .font(.body)
-                    }
-                    .buttonStyle(.plain)
-                }
+                postButton(feedPost)
             }
             .padding(.vertical, 4)
             .onAppear {
@@ -64,6 +41,42 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         }
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
+    }
+
+    @ViewBuilder
+    private func postButton(_ feedPost: BskyFeedViewPost) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Button {
+                print("push: \(feedPost.post.cid)")
+                router.push(.post(feedPost.post))
+            } label: {
+                Text(feedPost.post.record.text ?? "")
+                    .font(.body)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @ViewBuilder
+    private func authorButton(_ feedPost: BskyFeedViewPost) -> some View {
+        Button {
+            print("push: \(feedPost.post.author)")
+            router.push(.profile(feedPost.post.author))
+        } label: {
+            Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
+                .font(.headline)
+        }
+        .buttonStyle(.plain)
+        .padding(.vertical, 4)
+    }
+    
+    @ViewBuilder
+    private func createdAt(_ feedPost: BskyFeedViewPost) -> some View {
+        if let createdAt = feedPost.post.record.createdAt {
+            Text(createdAt)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func isNearBottom(_ feedPost: BskyFeedViewPost) -> Bool {
