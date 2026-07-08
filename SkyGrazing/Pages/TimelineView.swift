@@ -16,6 +16,15 @@ struct TimelineView: View {
                     BskyTimelineRequest(limit: limit, cursor: cursor)
                 })
                 .navigationTitle("Timeline")
+                .navigationDestination(for: TimelineRoute.self) { route in
+                    switch route {
+                    case .profile(let author):
+                        AuthorFeedView(actor: author.handle)
+                            .environment(router)
+                    case .post(let post):
+                        Text(post.record.text ?? "")
+                    }
+                }
 
         }
         .environment(router)

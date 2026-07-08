@@ -38,7 +38,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                 }
                 Button {
                     print("push: \(feedPost.post.cid)")
-                    router.push(.post(feedPost.post))
+//                    router.push(.post(feedPost.post))
                 } label: {
                     Text(feedPost.post.record.text ?? "")
                        .font(.body)
