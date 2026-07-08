@@ -27,6 +27,8 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                         Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
                         .font(.headline)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.vertical, 4)
                      Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
                      .font(.headline)
                     Spacer()
@@ -36,12 +38,15 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-                Button {
-                    print("push: \(feedPost.post.cid)")
-//                    router.push(.post(feedPost.post))
-                } label: {
-                    Text(feedPost.post.record.text ?? "")
-                       .font(.body)
+                VStack(alignment: .leading, spacing: 4) {
+                    Button {
+                        print("push: \(feedPost.post.cid)")
+                        router.push(.post(feedPost.post))
+                    } label: {
+                        Text(feedPost.post.record.text ?? "")
+                            .font(.body)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(.vertical, 4)
