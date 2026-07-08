@@ -17,13 +17,7 @@ struct TimelineView: View {
                 })
                 .navigationTitle("Timeline")
                 .navigationDestination(for: TimelineRoute.self) { route in
-                    switch route {
-                    case .profile(let author):
-                        AuthorFeedView(actor: author.handle)
-                            .environment(router)
-                    case .post(let post):
-                        Text(post.record.text ?? "")
-                    }
+                    router.destination(for: route)
                 }
 
         }
