@@ -10,7 +10,7 @@
 import Foundation
 
 struct BskyTimelineRequest: BskyRequestable {
-    typealias Response = BskyTimeline
+    typealias Response = BskyFeed
 
     let algorithm: String?
     let limit: Int?

@@ -14,11 +14,11 @@ struct TimelineView: View {
         NavigationStack(path: $router.path) {
             FeedView(viewModel: FeedViewModel { limit, cursor in
                     BskyTimelineRequest(limit: limit, cursor: cursor)
-                })
-                .navigationTitle("Timeline")
-                .navigationDestination(for: TimelineRoute.self) { route in
-                    router.destination(for: route)
-                }
+            })
+            .navigationTitle("Timeline")
+            .navigationDestination(for: TimelineRoute.self) { route in
+                router.destination(for: route)
+            }
 
         }
         .environment(router)

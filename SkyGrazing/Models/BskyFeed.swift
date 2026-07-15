@@ -9,7 +9,7 @@
 
 import Foundation
 
-struct BskyTimeline: Codable, BskyResponseCheckable {
+struct BskyFeed: Codable, BskyResponseCheckable {
     let cursor: String?
     let feed: [BskyFeedViewPost]?
 
@@ -25,7 +25,7 @@ struct BskyTimeline: Codable, BskyResponseCheckable {
 struct BskyFeedViewPost: Codable {
     let post: BskyPostView
     let reply: BskyReplyRef?
-    let reason: BskyFeedReason?
+    let reason: BskyReasonRepost?
     let feedContext: String?
 }
 
@@ -77,8 +77,10 @@ struct BskyReplyRef: Codable {
 }
 
 // MARK: - app.bsky.feed.defs#reasonRepost / reasonPin
-
-struct BskyFeedReason: Codable {
+// lexicon defines the metadata used in Bluesky feeds to indicate that a post appears
+//   because someone you follow reposted it. It contains the reposter’s profile info,
+//   the repost's URI/CID, and the timestamp
+struct BskyReasonRepost: Codable {
     let type: String?
     let by: BskyProfileViewBasic?
     let indexedAt: String?

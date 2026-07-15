@@ -10,7 +10,7 @@ import Observation
 
 @Observable
 class FeedViewModel<Request: BskyRequestable>: FeedViewModelProtocol
-    where Request.Response == BskyTimeline {
+    where Request.Response == BskyFeed {
 
     var isLoading = false
     var feedPosts: [BskyFeedViewPost] = []
