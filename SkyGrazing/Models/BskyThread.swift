@@ -22,7 +22,7 @@ struct BskyThread: Codable, BskyResponseCheckable {
 // MARK: - app.bsky.feed.defs#threadViewPost
 // class を使用: parent / replies が再帰的な構造のため
 
-class BskyThreadViewPost: Codable {
+class BskyThreadViewPost: Codable, BskyPostContainable {
     let post: BskyPostView
     let parent: BskyThreadViewPost?
     let replies: [BskyThreadViewPost]?

@@ -20,9 +20,15 @@ struct BskyFeedPage: Codable, BskyResponseCheckable {
     }
 }
 
+// MARK: - BskyPostContainable
+
+protocol BskyPostContainable {
+    var post: BskyPostView { get }
+}
+
 // MARK: - app.bsky.feed.defs#feedViewPost
 
-struct BskyFeedViewPost: Codable {
+struct BskyFeedViewPost: Codable, BskyPostContainable {
     let post: BskyPostView
     let reply: BskyReplyRef?
     let reason: BskyReasonRepost?

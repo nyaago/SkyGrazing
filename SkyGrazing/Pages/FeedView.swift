@@ -44,7 +44,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     }
 
     @ViewBuilder
-    private func postButton(_ feedPost: BskyFeedViewPost) -> some View {
+    private func postButton(_ feedPost: some BskyPostContainable) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Button {
                 print("push: \(feedPost.post.cid)")
@@ -58,7 +58,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     }
 
     @ViewBuilder
-    private func authorButton(_ feedPost: BskyFeedViewPost) -> some View {
+    private func authorButton(_ feedPost: some BskyPostContainable) -> some View {
         Button {
             print("push: \(feedPost.post.author)")
             router.push(.profile(feedPost.post.author))
@@ -73,7 +73,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     }
     
     @ViewBuilder
-    private func createdAt(_ feedPost: BskyFeedViewPost) -> some View {
+    private func createdAt(_ feedPost: some BskyPostContainable) -> some View {
         if let createdAt = feedPost.post.record.createdAt {
             Text(createdAt).modifier(CaptionModifier())
         }
