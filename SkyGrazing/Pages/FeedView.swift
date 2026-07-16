@@ -51,7 +51,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                 router.push(.post(feedPost.post))
             } label: {
                 Text(feedPost.post.record.text ?? "")
-                    .font(.body)
+                    .modifier(BodyTextModifier())
             }
             .buttonStyle(.plain)
         }
@@ -64,7 +64,9 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             router.push(.profile(feedPost.post.author))
         } label: {
             Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
-                .font(.headline)
+                .modifier(HeadlineModifier())
+            Text("@" + feedPost.post.author.handle)
+                .modifier(CaptionModifier())
         }
         .buttonStyle(.plain)
         .padding(.vertical, 4)
@@ -73,9 +75,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @ViewBuilder
     private func createdAt(_ feedPost: BskyFeedViewPost) -> some View {
         if let createdAt = feedPost.post.record.createdAt {
-            Text(createdAt)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Text(createdAt).modifier(CaptionModifier())
         }
     }
 
