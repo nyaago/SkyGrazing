@@ -10,7 +10,6 @@ import SwiftUI
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel: ViewModel
-    @Environment(TimelineRouter.self) private var router
     
     init(viewModel: ViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -18,20 +17,12 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
 
     var body: some View {
         List(viewModel.feedPosts, id: \.post.cid) { feedPost in
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    authorButton(feedPost)
-                    Spacer()
-                    createdAt(feedPost)
+            PostRowView(postContainer: feedPost)
+                .onAppear {
+                    if isNearBottom(feedPost) {
+                        viewModel.loadMore(service: service)
+                    }
                 }
-                postButton(feedPost)
-            }
-            .padding(.vertical, 4)
-            .onAppear {
-                if isNearBottom(feedPost) {
-                    viewModel.loadMore(service: service)
-                }
-            }
         }
         .listStyle(.plain)
         .overlay {
@@ -41,42 +32,6 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         }
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
-    }
-
-    @ViewBuilder
-    private func postButton(_ feedPost: some BskyPostContainable) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Button {
-                print("push: \(feedPost.post.cid)")
-                router.push(.post(feedPost.post))
-            } label: {
-                Text(feedPost.post.record.text ?? "")
-                    .modifier(BodyTextModifier())
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    @ViewBuilder
-    private func authorButton(_ feedPost: some BskyPostContainable) -> some View {
-        Button {
-            print("push: \(feedPost.post.author)")
-            router.push(.profile(feedPost.post.author))
-        } label: {
-            Text(feedPost.post.author.displayName ?? feedPost.post.author.handle)
-                .modifier(HeadlineModifier())
-            Text("@" + feedPost.post.author.handle)
-                .modifier(CaptionModifier())
-        }
-        .buttonStyle(.plain)
-        .padding(.vertical, 4)
-    }
-    
-    @ViewBuilder
-    private func createdAt(_ feedPost: some BskyPostContainable) -> some View {
-        if let createdAt = feedPost.post.record.createdAt {
-            Text(createdAt).modifier(CaptionModifier())
-        }
     }
 
     private func isNearBottom(_ feedPost: BskyFeedViewPost) -> Bool {
