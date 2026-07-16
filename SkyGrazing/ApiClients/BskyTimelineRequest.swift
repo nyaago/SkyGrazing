@@ -4,13 +4,12 @@
 //
 //  Created by nyaago on 2026/06/20.
 //
-
 // https://docs.bsky.app/docs/api/app-bsky-feed-get-timeline
 
 import Foundation
 
 struct BskyTimelineRequest: BskyRequestable {
-    typealias Response = BskyFeed
+    typealias Response = BskyFeedPage
 
     let algorithm: String?
     let limit: Int?

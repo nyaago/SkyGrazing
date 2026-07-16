@@ -10,7 +10,7 @@
 import Foundation
 
 struct BskyAuthorFeedRequest: BskyRequestable {
-    typealias Response = BskyFeed
+    typealias Response = BskyFeedPage
 
     let actor: String
     let limit: Int?

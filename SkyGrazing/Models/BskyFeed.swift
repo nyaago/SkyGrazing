@@ -9,7 +9,7 @@
 
 import Foundation
 
-struct BskyFeed: Codable, BskyResponseCheckable {
+struct BskyFeedPage: Codable, BskyResponseCheckable {
     let cursor: String?
     let feed: [BskyFeedViewPost]?
 
