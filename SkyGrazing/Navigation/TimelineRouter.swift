@@ -27,7 +27,8 @@ final class TimelineRouter {
             AuthorFeedView(actor: author.handle)
                 .environment(self)
         case .post(let post):
-            Text(post.record.text ?? "")
+             ThreadView(uri: post.uri)
+                .environment(self)
         }
     }
 }

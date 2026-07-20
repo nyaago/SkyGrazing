@@ -36,6 +36,11 @@ class ThreadViewModel {
         }
     }
 
+    
+    @MainActor
+    func onDisappear() {
+        
+    }
     /// スレッドのリプライをフラットなリストに変換する
     func flattenReplies() -> [BskyThreadViewPost] {
         guard let thread else { return [] }
