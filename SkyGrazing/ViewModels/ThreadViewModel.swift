@@ -41,6 +41,13 @@ class ThreadViewModel {
     func onDisappear() {
         
     }
+    
+    // 親投稿 + 対象投稿 + そのreply
+    func flattenPosts() -> [BskyThreadViewPost] {
+        guard let thread else { return [] }
+        return flattenParents() + [thread] + flattenReplies()
+    }
+    
     /// スレッドのリプライをフラットなリストに変換する
     func flattenReplies() -> [BskyThreadViewPost] {
         guard let thread else { return [] }

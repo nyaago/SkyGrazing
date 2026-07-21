@@ -16,21 +16,16 @@ struct ThreadView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        List(viewModel.flattenPosts(), id: \.post.cid) { feedPost in
+            PostRowView(postContainer: feedPost)
+                .onAppear {
+                }
+        }
+        .listStyle(.plain)
+        .overlay {
             if viewModel.isLoading {
                 ProgressView()
             }
-            if let thread = viewModel.thread {
-                PostRowView(postContainer: thread)
-            } else {
-                ProgressView() // TODO error handling
-            }
-            List(viewModel.flattenReplies(), id: \.post.cid) { feedPost in
-                PostRowView(postContainer: feedPost)
-                    .onAppear {
-                    }
-            }
-            .listStyle(.plain)
         }
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
