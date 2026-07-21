@@ -16,10 +16,18 @@ struct ThreadView: View {
     }
 
     var body: some View {
-        List(viewModel.flattenPosts(), id: \.post.cid) { feedPost in
-            PostRowView(postContainer: feedPost)
-                .onAppear {
+        List(viewModel.displayPosts(), id: \.post.cid) { displayPost in
+            Group {
+                // @todo: kind ごとに対応する View を実装して切り替える
+                switch displayPost {
+                case .parent:
+                    PostRowView(postContainer: displayPost)
+                case .current:
+                    PostRowView(postContainer: displayPost)
+                case .reply:
+                    PostRowView(postContainer: displayPost)
                 }
+            }
         }
         .listStyle(.plain)
         .overlay {
