@@ -18,15 +18,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     var body: some View {
         List(viewModel.displayPosts, id: \.post.cid) { displayPost in
             Group {
-                switch displayPost {
-                // @todo: kind ごとに対応する View を実装して切り替える
-                case .regular:
-                    PostRowView(postContainer: displayPost)
-                case .reply:
-                    PostRowView(postContainer: displayPost)
-                case .repost:
-                    PostRowView(postContainer: displayPost)
-                }
+                element(for: displayPost)
             }
             .onAppear {
                 if isNearBottom(displayPost) {
@@ -44,6 +36,20 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         .onDisappear { viewModel.onDisappear() }
     }
 
+    private func element(for post: PostDisplayKind) -> some View {
+        Group {
+            // @todo: kind ごとに対応する View を実装して切り替える
+            switch post {
+                case .regular:
+                    PostRowView(postContainer: post)
+                case .reply:
+                    PostRowView(postContainer: post)
+                case .repost:
+                    PostRowView(postContainer: post)
+            }
+        }
+    }
+    
     private func isNearBottom(_ displayPost: PostDisplayKind) -> Bool {
         let posts = viewModel.displayPosts
         guard let index = posts.firstIndex(where: { $0.post.cid == displayPost.post.cid }) else {

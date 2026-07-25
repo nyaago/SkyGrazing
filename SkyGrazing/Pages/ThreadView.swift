@@ -18,15 +18,7 @@ struct ThreadView: View {
     var body: some View {
         List(viewModel.displayPosts(), id: \.post.cid) { displayPost in
             Group {
-                // @todo: kind ごとに対応する View を実装して切り替える
-                switch displayPost {
-                case .parent:
-                    PostRowView(postContainer: displayPost)
-                case .current:
-                    PostRowView(postContainer: displayPost)
-                case .reply:
-                    PostRowView(postContainer: displayPost)
-                }
+                element(for: displayPost)
             }
         }
         .listStyle(.plain)
@@ -38,5 +30,19 @@ struct ThreadView: View {
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
 
+    }
+    
+    private func element(for post: ThreadDisplayKind) -> some View {
+        Group {
+            // @todo: kind ごとに対応する View を実装して切り替える
+            switch post {
+                case .parent:
+                    PostRowView(postContainer: post)
+                case .current:
+                    PostRowView(postContainer: post)
+                case .reply:
+                    PostRowView(postContainer: post)
+            }
+        }
     }
 }
