@@ -39,7 +39,7 @@ struct ThreadView: View {
                 case .parent:
                     PostRowView(postContainer: post)
                 case .current:
-                    PostRowView(postContainer: post)
+                    CurrentPostRowView(postContainer: post)
                 case .reply:
                     PostRowView(postContainer: post)
             }
