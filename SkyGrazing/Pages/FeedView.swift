@@ -45,7 +45,7 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                 case .reply:
                     ReplyPostRowView(displayPost: post)
                 case .repost:
-                    PostRowView(postContainer: post)
+                    RepostRowView(displayPost: post)
             }
         }
     }
