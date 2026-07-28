@@ -32,7 +32,7 @@ struct ThreadView: View {
 
     }
     
-    private func element(for post: ThreadDisplayKind) -> some View {
+    private func element(for post: ThreadPostWrapper) -> some View {
         Group {
             // @todo: kind ごとに対応する View を実装して切り替える
             switch post {

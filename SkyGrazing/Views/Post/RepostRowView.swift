@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct RepostRowView: View {
-    let displayPost: PostDisplayKind
+    let postContainer: FeedPostWrapper
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            if let repostBy = displayPost.feedPost.reason?.by {
+            if let repostBy = postContainer.feedPost.reason?.by {
                 RepostButtonView(repostAuthor: repostBy)
             }
             HStack {
-                AuthorButtonView(author: displayPost.post.author)
+                AuthorButtonView(author: postContainer.post.author)
                 Spacer()
-                CreatedAtText(createdAt: displayPost.post.record.createdAt)
+                CreatedAtText(createdAt: postContainer.post.record.createdAt)
             }
-            PostBodyView(post: displayPost.post)
+            PostBodyView(post: postContainer.post)
         }
         .padding(.vertical, 4)
     }

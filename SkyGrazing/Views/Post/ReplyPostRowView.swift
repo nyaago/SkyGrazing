@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct ReplyPostRowView: View {
-    let displayPost: PostDisplayKind
+    let postContainer: FeedPostWrapper
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                AuthorButtonView(author: displayPost.post.author)
+                AuthorButtonView(author: postContainer.post.author)
                 Spacer()
-                CreatedAtText(createdAt: displayPost.post.record.createdAt)
+                CreatedAtText(createdAt: postContainer.post.record.createdAt)
             }
-            if let parentAuthor = displayPost.feedPost.reply?.parent?.author {
+            if let parentAuthor = postContainer.feedPost.reply?.parent?.author {
                 ReplyToButtonView(parentAuthor: parentAuthor)
             }
-            PostBodyView(post: displayPost.post)
+            PostBodyView(post: postContainer.post)
         }
         .padding(.vertical, 4)
     }

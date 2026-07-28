@@ -36,21 +36,21 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         .onDisappear { viewModel.onDisappear() }
     }
 
-    private func element(for post: PostDisplayKind) -> some View {
+    private func element(for post: FeedPostWrapper) -> some View {
         Group {
             // @todo: kind ごとに対応する View を実装して切り替える
             switch post {
                 case .regular:
                     PostRowView(postContainer: post)
                 case .reply:
-                    ReplyPostRowView(displayPost: post)
+                    ReplyPostRowView(postContainer: post)
                 case .repost:
-                    RepostRowView(displayPost: post)
+                    RepostRowView(postContainer: post)
             }
         }
     }
     
-    private func isNearBottom(_ displayPost: PostDisplayKind) -> Bool {
+    private func isNearBottom(_ displayPost: FeedPostWrapper) -> Bool {
         let posts = viewModel.displayPosts
         guard let index = posts.firstIndex(where: { $0.post.cid == displayPost.post.cid }) else {
             return false

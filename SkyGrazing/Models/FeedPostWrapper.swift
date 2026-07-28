@@ -8,7 +8,7 @@
 import Foundation
 
 /// Feed 一覧における投稿の種類を分類する wrapper
-enum PostDisplayKind: BskyPostContainable {
+enum FeedPostWrapper: BskyPostContainable {
     case regular(BskyFeedViewPost)
     case reply(BskyFeedViewPost)
     case repost(BskyFeedViewPost)
@@ -26,7 +26,7 @@ enum PostDisplayKind: BskyPostContainable {
         }
     }
 
-    static func from(_ feedPost: BskyFeedViewPost) -> PostDisplayKind {
+    static func from(_ feedPost: BskyFeedViewPost) -> FeedPostWrapper {
         if feedPost.reason != nil {
             return .repost(feedPost)
         } else if feedPost.reply != nil {

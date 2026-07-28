@@ -17,8 +17,8 @@ protocol FeedViewModelProtocol: Observable, AnyObject {
     func loadMore(service: BskyService)
 }
 extension FeedViewModelProtocol {
-    var displayPosts: [PostDisplayKind] {
-        feedPosts.map { PostDisplayKind.from($0) }
+    var displayPosts: [FeedPostWrapper] {
+        feedPosts.map { FeedPostWrapper.from($0) }
     }
 }
 

@@ -49,7 +49,7 @@ class ThreadViewModel {
     }
 
     // 親投稿 + 対象投稿 + そのreply。ThreadDisplayKind で wrap
-    func displayPosts() -> [ThreadDisplayKind] {
+    func displayPosts() -> [ThreadPostWrapper] {
         guard let thread else { return [] }
         return flattenParents().map { .parent($0) }
             + [.current(thread)]

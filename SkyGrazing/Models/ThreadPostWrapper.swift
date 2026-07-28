@@ -8,7 +8,7 @@
 import Foundation
 
 /// Thread 表示における投稿の種類を分類する wrapper
-enum ThreadDisplayKind: BskyPostContainable {
+enum ThreadPostWrapper: BskyPostContainable {
     case parent(BskyThreadViewPost)
     case current(BskyThreadViewPost)
     case reply(BskyThreadViewPost)
