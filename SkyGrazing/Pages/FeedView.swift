@@ -16,13 +16,15 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     }
 
     var body: some View {
-        List(viewModel.feedPosts, id: \.post.cid) { feedPost in
-            PostRowView(postContainer: feedPost)
-                .onAppear {
-                    if isNearBottom(feedPost) {
-                        viewModel.loadMore(service: service)
-                    }
+        List(viewModel.displayPosts, id: \.post.cid) { displayPost in
+            Group {
+                element(for: displayPost)
+            }
+            .onAppear {
+                if isNearBottom(displayPost) {
+                    viewModel.loadMore(service: service)
                 }
+            }
         }
         .listStyle(.plain)
         .overlay {
@@ -34,11 +36,26 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
         .onDisappear { viewModel.onDisappear() }
     }
 
-    private func isNearBottom(_ feedPost: BskyFeedViewPost) -> Bool {
-        guard let index = viewModel.feedPosts.firstIndex(where: { $0.post.cid == feedPost.post.cid }) else {
+    private func element(for post: FeedPostWrapper) -> some View {
+        Group {
+            // @todo: kind ごとに対応する View を実装して切り替える
+            switch post {
+                case .regular:
+                    PostRowView(postContainer: post)
+                case .reply:
+                    ReplyPostRowView(postContainer: post)
+                case .repost:
+                    RepostRowView(postContainer: post)
+            }
+        }
+    }
+    
+    private func isNearBottom(_ displayPost: FeedPostWrapper) -> Bool {
+        let posts = viewModel.displayPosts
+        guard let index = posts.firstIndex(where: { $0.post.cid == displayPost.post.cid }) else {
             return false
         }
-        return index >= viewModel.feedPosts.count - 3
+        return index >= posts.count - 3
     }
 }
 

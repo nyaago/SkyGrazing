@@ -16,24 +16,33 @@ struct ThreadView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
+        List(viewModel.displayPosts(), id: \.post.cid) { displayPost in
+            Group {
+                element(for: displayPost)
+            }
+        }
+        .listStyle(.plain)
+        .overlay {
             if viewModel.isLoading {
                 ProgressView()
             }
-            if let thread = viewModel.thread {
-                PostRowView(postContainer: thread)
-            } else {
-                ProgressView() // TODO error handling
-            }
-            List(viewModel.flattenReplies(), id: \.post.cid) { feedPost in
-                PostRowView(postContainer: feedPost)
-                    .onAppear {
-                    }
-            }
-            .listStyle(.plain)
         }
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
 
+    }
+    
+    private func element(for post: ThreadPostWrapper) -> some View {
+        Group {
+            // @todo: kind ごとに対応する View を実装して切り替える
+            switch post {
+                case .parent:
+                    PostRowView(postContainer: post)
+                case .current:
+                    CurrentPostRowView(postContainer: post)
+                case .reply:
+                    PostRowView(postContainer: post)
+            }
+        }
     }
 }

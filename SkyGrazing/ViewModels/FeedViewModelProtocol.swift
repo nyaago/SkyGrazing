@@ -16,3 +16,9 @@ protocol FeedViewModelProtocol: Observable, AnyObject {
     func onDisappear()
     func loadMore(service: BskyService)
 }
+extension FeedViewModelProtocol {
+    var displayPosts: [FeedPostWrapper] {
+        feedPosts.map { FeedPostWrapper.from($0) }
+    }
+}
+
