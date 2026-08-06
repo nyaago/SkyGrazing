@@ -15,11 +15,7 @@ struct RepostRowView: View {
             if let repostBy = postContainer.feedPost.reason?.by {
                 RepostButtonView(repostAuthor: repostBy)
             }
-            HStack {
-                AuthorButtonView(author: postContainer.post.author)
-                Spacer()
-                CreatedAtText(createdAt: postContainer.post.record.createdAt)
-            }
+            PostHeaderView(postContainer: postContainer)
             PostBodyView(post: postContainer.post)
         }
         .padding(.vertical, 4)
