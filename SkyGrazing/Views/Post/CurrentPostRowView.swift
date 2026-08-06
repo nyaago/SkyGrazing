@@ -18,6 +18,7 @@ struct CurrentPostRowView: View {
                 CreatedAtText(createdAt: postContainer.post.record.createdAt)
             }
             CurrentPostBodyView(post: postContainer.post)
+            CurrentPostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }

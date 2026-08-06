@@ -14,6 +14,7 @@ struct PostRowView: View {
         VStack(alignment: .leading, spacing: 4) {
             PostHeaderView(postContainer: postContainer)
             PostBodyView(post: postContainer.post)
+            PostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }

@@ -17,6 +17,7 @@ struct ReplyPostRowView: View {
                 ReplyToButtonView(parentAuthor: parentAuthor)
             }
             PostBodyView(post: postContainer.post)
+            PostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }

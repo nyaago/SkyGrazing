@@ -17,6 +17,7 @@ struct RepostRowView: View {
             }
             PostHeaderView(postContainer: postContainer)
             PostBodyView(post: postContainer.post)
+            PostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }
