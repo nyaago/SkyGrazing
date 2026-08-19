@@ -13,8 +13,11 @@ struct PostFooterView: View {
     var body: some View {
         HStack {
             ReplyCountButtonView(replyCount: postContainer.post.replyCount ?? 0)
+                .modifier(CellFooterElementModifier())
             RepostCountButtonView(repostCount: postContainer.post.repostCount ?? 0)
+                .modifier(CellFooterElementModifier())
             LikeButtonView(likeCount: postContainer.post.likeCount ?? 0)
+                .modifier(CellFooterElementModifier())
         }
         .modifier(CellFooterModifier())
     }
