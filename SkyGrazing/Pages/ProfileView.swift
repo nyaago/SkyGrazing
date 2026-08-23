@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(BskyService.self) private var service
-    @State private var viewModel = ProfileViewModel()
+    @State private var viewModel = MyFeedViewModel()
     
     var body: some View {
         VStack {
@@ -21,7 +21,7 @@ struct ProfileView: View {
                 ProgressView()
             }
         }
-        .onAppear { viewModel.onAppear(handle: UserSettings.handle, service: service) }
+        .onAppear { viewModel.onAppear(service: service) }
     }
 }
 
