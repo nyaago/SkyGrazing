@@ -12,7 +12,7 @@ struct CreatedAtText: View {
 
     var body: some View {
         if let createdAt {
-            Text(createdAt).modifier(CaptionModifier())
+            Text(AbsoluteDateFormatter.string(from: createdAt) ?? "").modifier(CaptionModifier())
         }
     }
 }

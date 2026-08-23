@@ -12,15 +12,12 @@ struct ReplyPostRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                AuthorButtonView(author: postContainer.post.author)
-                Spacer()
-                CreatedAtText(createdAt: postContainer.post.record.createdAt)
-            }
+            PostHeaderView(postContainer: postContainer)
             if let parentAuthor = postContainer.feedPost.reply?.parent?.author {
                 ReplyToButtonView(parentAuthor: parentAuthor)
             }
             PostBodyView(post: postContainer.post)
+            PostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }

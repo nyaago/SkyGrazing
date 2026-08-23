@@ -14,10 +14,9 @@ struct CurrentPostRowView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 AuthorButtonView(author: postContainer.post.author)
-                Spacer()
-                CreatedAtText(createdAt: postContainer.post.record.createdAt)
             }
             CurrentPostBodyView(post: postContainer.post)
+            CurrentPostFooterView(postContainer: postContainer)
         }
         .padding(.vertical, 4)
     }
