@@ -18,7 +18,7 @@ struct RepostCountButtonView: View {
                 Image(systemName: "arrow.2.squarepath")
                 Text("\(repostCount)")
             }
-            .modifier(CaptionModifier())
+            .modifier(CellActionButtonModifier())
         }
         .buttonStyle(.plain)
     }

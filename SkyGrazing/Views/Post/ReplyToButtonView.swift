@@ -21,7 +21,7 @@ struct ReplyToButtonView: View {
                 Text(parentAuthor.displayName ?? parentAuthor.handle)
                     .fontWeight(.semibold)
             }
-            .modifier(CaptionModifier())
+            .modifier(CellActionButtonModifier())
         }
         .buttonStyle(.plain)
     }

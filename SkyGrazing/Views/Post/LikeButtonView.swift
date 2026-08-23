@@ -18,7 +18,7 @@ struct LikeButtonView: View {
                 Image(systemName: "heart")
                 Text("\(likeCount)")
             }
-            .modifier(CaptionModifier())
+            .modifier(CellActionButtonModifier())
         }
         .buttonStyle(.plain)
     }

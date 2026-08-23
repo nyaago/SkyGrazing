@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-struct CellFooterElementModifier: ViewModifier {
+struct CellActionButtonModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .font(.caption)
+            .foregroundColor(.secondary)
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 6))
     }
 }
