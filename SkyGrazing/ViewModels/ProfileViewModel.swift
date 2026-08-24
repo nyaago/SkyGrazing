@@ -11,6 +11,7 @@ import Observation
 @Observable
 class ProfileViewModel: FeedViewModelProtocol {
     var isLoading = false
+    var isLoadingProfile = false
     var feedPosts: [BskyFeedViewPost] = []
     var profile: BskyProfile?
 
@@ -31,18 +32,31 @@ class ProfileViewModel: FeedViewModelProtocol {
 
         Task {
             defer { isLoading = false }
-            async let profileResult = fetchProfile(service: service)
             async let feedResult = fetchFeed(service: service, limit: limit, cursor: nil)
-            self.profile = await profileResult
             let feed = await feedResult
             if let feed {
                 self.feedPosts = feed.feed ?? []
                 self.cursor = feed.cursor
                 self.hasMore = feed.cursor != nil
             }
+            isLoading = true
         }
     }
 
+    @MainActor
+    func onAppearProfile(service: BskyService) {
+        guard !isLoading else { return }
+        isLoadingProfile = true
+
+        Task {
+            defer { isLoadingProfile = false }
+            async let profileResult = fetchProfile(service: service)
+            self.profile = await profileResult
+            isLoadingProfile = true
+        }
+    }
+
+    
     @MainActor
     func onDisappear() {
         // no polling for my feed

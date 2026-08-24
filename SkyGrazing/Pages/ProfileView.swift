@@ -10,18 +10,29 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel = ProfileViewModel()
+    @State var router: TimelineRouter = .init()
     
     var body: some View {
-        VStack {
-            if let profile = viewModel.profile {
-                Text(profile.displayName ?? UserSettings.handle)
-                    .font(.largeTitle)
-                Text(profile.description ?? "")
-            } else if viewModel.isLoading {
-                ProgressView()
+        NavigationStack(path: $router.path) {
+            VStack {
+                if viewModel.isLoadingProfile {
+                    ProgressView()
+                }
+                else {
+                    if let profile = viewModel.profile {
+                        ProfileHeaderView(profile: profile)
+                        FeedView(viewModel: FeedViewModel { limit, cursor in
+                            BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
+                        })
+                    }
+                }
             }
+            .navigationDestination(for: TimelineRoute.self) { route in
+                router.destination(for: route)
+            }
+            .onAppear { viewModel.onAppearProfile(service: service) }
         }
-        .onAppear { viewModel.onAppear(service: service) }
+        .environment(router)
     }
 }
 

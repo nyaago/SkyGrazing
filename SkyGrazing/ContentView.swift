@@ -19,9 +19,7 @@ struct ContentView: View {
                     }
                 }
                 Tab("Profile", systemImage: "person.circle") {
-                    NavigationStack {
-                        ProfileView()
-                    }
+                    ProfileView()
                 }
             }
             .tabViewStyle(.sidebarAdaptable)
