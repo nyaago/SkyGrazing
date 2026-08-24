@@ -9,17 +9,24 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(BskyService.self) private var service
+    @State var timelineRouter: TimelineRouter = .init()
+    @State var profileRouter: TimelineRouter = .init()
 
     var body: some View {
         if service.isLoggedIn {
             TabView {
                 Tab("Timeline", systemImage: "list.bullet") {
-                    NavigationStack {
+                    NavigationStack(path: $timelineRouter.path) {
                         TimelineView()
                     }
+                    .environment(timelineRouter)
                 }
                 Tab("Profile", systemImage: "person.circle") {
-                    ProfileView()
+                    NavigationStack(path: $profileRouter.path) {
+                        ProfileView()
+                            
+                    }
+                    .environment(profileRouter)
                 }
             }
             .tabViewStyle(.sidebarAdaptable)

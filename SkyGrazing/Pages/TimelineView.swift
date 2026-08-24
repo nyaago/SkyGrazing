@@ -8,20 +8,16 @@
 import SwiftUI
 
 struct TimelineView: View {
-    @State var router: TimelineRouter = .init()
+    @Environment(TimelineRouter.self) private var router
     
     var body: some View {
-        NavigationStack(path: $router.path) {
-            FeedView(viewModel: FeedViewModel { limit, cursor in
-                    BskyTimelineRequest(limit: limit, cursor: cursor)
-            })
-            .navigationTitle("Timeline")
-            .navigationDestination(for: TimelineRoute.self) { route in
-                router.destination(for: route)
-            }
-
+        FeedView(viewModel: FeedViewModel { limit, cursor in
+                BskyTimelineRequest(limit: limit, cursor: cursor)
+        })
+        .navigationTitle("Timeline")
+        .navigationDestination(for: TimelineRoute.self) { route in
+            router.destination(for: route)
         }
-        .environment(router)
     }
 }
 
@@ -30,4 +26,5 @@ struct TimelineView: View {
         TimelineView()
     }
     .environment(BskyService())
+    .environment(TimelineRouter())
 }
