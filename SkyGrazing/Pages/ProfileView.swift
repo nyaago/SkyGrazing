@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(BskyService.self) private var service
-    @State private var viewModel = MyFeedViewModel()
+    @State private var viewModel = ProfileViewModel()
     
     var body: some View {
         VStack {

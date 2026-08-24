@@ -1,41 +1,86 @@
 //
-//  ProfileViewModel.swift
+//  MyFeedViewModel.swift
 //  SkyGrazing
 //
-//  Created by nyaago on 2026/04/06.
+//  Created by nyaago on 2026/08/23.
 //
 
 import Foundation
 import Observation
 
 @Observable
-class ProfileViewModel {
+class ProfileViewModel: FeedViewModelProtocol {
     var isLoading = false
+    var feedPosts: [BskyFeedViewPost] = []
     var profile: BskyProfile?
-    
+
+    private var cursor: String?
+    private var hasMore = true
+
+    private var limit: Int = 50
+    private var moreLimit: Int = 30
+
+    private var handle: String {
+        UserSettings.handle
+    }
+
     @MainActor
-    func onAppear(handle: String, service: BskyService) {
+    func onAppear(service: BskyService) {
         guard !isLoading else { return }
         isLoading = true
-        
+
         Task {
             defer { isLoading = false }
-            let request = BskyProfileRequest(actor: handle)
-            do {
-                self.profile = try await service.fetch(request)
-                // TODO エラー時の UI の処理
-                /*
-                 } catch let error as BskyApiError {
-                 switch error {
-                 case .apiError(let error, let message):
-                 print("API error: \(error) - \(message)")
-                 }
-                 
-                 }
-                 */
-            } catch {
-                print("error: \(error)")
+            async let profileResult = fetchProfile(service: service)
+            async let feedResult = fetchFeed(service: service, limit: limit, cursor: nil)
+            self.profile = await profileResult
+            let feed = await feedResult
+            if let feed {
+                self.feedPosts = feed.feed ?? []
+                self.cursor = feed.cursor
+                self.hasMore = feed.cursor != nil
             }
+        }
+    }
+
+    @MainActor
+    func onDisappear() {
+        // no polling for my feed
+    }
+
+    @MainActor
+    func loadMore(service: BskyService) {
+        guard !isLoading, hasMore, let cursor else { return }
+        isLoading = true
+
+        Task {
+            defer { isLoading = false }
+            let feed = await fetchFeed(service: service, limit: moreLimit, cursor: cursor)
+            if let feed {
+                self.feedPosts.append(contentsOf: feed.feed ?? [])
+                self.cursor = feed.cursor
+                self.hasMore = feed.cursor != nil
+            }
+        }
+    }
+
+    private func fetchProfile(service: BskyService) async -> BskyProfile? {
+        let request = BskyProfileRequest(actor: handle)
+        do {
+            return try await service.fetch(request)
+        } catch {
+            print("profile error: \(error)")
+            return nil
+        }
+    }
+
+    private func fetchFeed(service: BskyService, limit: Int, cursor: String?) async -> BskyFeedPage? {
+        let request = BskyAuthorFeedRequest(actor: handle, limit: limit, cursor: cursor)
+        do {
+            return try await service.fetch(request)
+        } catch {
+            print("feed error: \(error)")
+            return nil
         }
     }
 }
