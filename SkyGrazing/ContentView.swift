@@ -23,8 +23,7 @@ struct ContentView: View {
                 }
                 Tab("Profile", systemImage: "person.circle") {
                     NavigationStack(path: $profileRouter.path) {
-                        ProfileView()
-                            
+                        ProfileView(actor: UserSettings.handle)
                     }
                     .environment(profileRouter)
                 }

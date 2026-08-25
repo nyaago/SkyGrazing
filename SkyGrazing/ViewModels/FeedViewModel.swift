@@ -27,6 +27,10 @@ where Request.Response == BskyFeedPage {
     
     private let makeRequest: (_ limit: Int?, _ cursor: String?) -> Request
     
+    var handle: String? {
+        return nil
+    }
+    
     init(makeRequest: @escaping (_ limit: Int?, _ cursor: String?) -> Request) {
         self.makeRequest = makeRequest
     }

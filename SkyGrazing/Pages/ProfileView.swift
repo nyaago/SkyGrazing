@@ -8,10 +8,17 @@
 import SwiftUI
 
 struct ProfileView: View {
+    let actor: String
+
     @Environment(BskyService.self) private var service
-    @State private var viewModel = ProfileViewModel()
+    @State private var viewModel: ProfileViewModel
     @Environment(TimelineRouter.self) private var router
-    
+
+    init(actor: String) {
+        self.actor = actor
+        self._viewModel = State(initialValue: ProfileViewModel(handle: actor))
+    }
+
     var body: some View {
         VStack {
             if viewModel.isLoadingProfile {
@@ -34,7 +41,7 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(actor: UserSettings.handle)
         .environment(BskyService())
         .environment(TimelineRouter())
 }

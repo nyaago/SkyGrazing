@@ -21,8 +21,10 @@ class ProfileViewModel: FeedViewModelProtocol {
     private var limit: Int = 50
     private var moreLimit: Int = 30
 
-    private var handle: String {
-        UserSettings.handle
+    var handle: String?
+
+    init(handle: String) {
+        self.handle = handle
     }
 
     @MainActor
@@ -79,6 +81,10 @@ class ProfileViewModel: FeedViewModelProtocol {
     }
 
     private func fetchProfile(service: BskyService) async -> BskyProfile? {
+        guard let handle else {
+            print("handle can't be nil")
+            return nil
+        }
         let request = BskyProfileRequest(actor: handle)
         do {
             return try await service.fetch(request)
@@ -89,6 +95,10 @@ class ProfileViewModel: FeedViewModelProtocol {
     }
 
     private func fetchFeed(service: BskyService, limit: Int, cursor: String?) async -> BskyFeedPage? {
+        guard let handle else {
+            print("handle can't be nil")
+            return nil
+        }
         let request = BskyAuthorFeedRequest(actor: handle, limit: limit, cursor: cursor)
         do {
             return try await service.fetch(request)
