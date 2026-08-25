@@ -30,6 +30,7 @@ struct ProfileView: View {
                     FeedView(viewModel: FeedViewModel { limit, cursor in
                         BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
                     })
+                    .environment(\.profileActor, profile.handle)
                 }
             }
         }
