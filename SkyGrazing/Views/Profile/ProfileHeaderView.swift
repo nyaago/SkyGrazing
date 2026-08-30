@@ -12,11 +12,17 @@ struct ProfileHeaderView: View {
     
     var body: some View {
         VStack {
-            if let profile  {
-                Text(profile.displayName ?? UserSettings.handle)
-                    .font(.largeTitle)
-                Text(profile.description ?? "")
+            VStack {
+                if let profile  {
+                    ProfileNameView(profile: profile)
+                        .modifier(HeaderElementModifier())
+                    ProfileHandleView(profile: profile)
+                        .modifier(HeaderElementModifier())
+                    ProfileDescriptionView(profile: profile)
+                        .modifier(HeaderElementModifier())
+                }
             }
+            .modifier(HeaderContentsModifier())
         }
     }
 }
