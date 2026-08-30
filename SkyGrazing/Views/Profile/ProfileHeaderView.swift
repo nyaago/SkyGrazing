@@ -18,6 +18,8 @@ struct ProfileHeaderView: View {
                         .modifier(HeaderElementModifier())
                     ProfileHandleView(profile: profile)
                         .modifier(HeaderElementModifier())
+                    ProfileStatsView(profile: profile)
+                        .modifier(HeaderElementModifier())
                     ProfileDescriptionView(profile: profile)
                         .modifier(HeaderElementModifier())
                 }
