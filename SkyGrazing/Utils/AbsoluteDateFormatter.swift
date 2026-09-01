@@ -21,4 +21,10 @@ struct AbsoluteDateFormatter {
         }
         return string(from: date)
     }
+    
+    static func monthAndDay(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("yM")
+        return formatter.string(from: date)
+    }
 }

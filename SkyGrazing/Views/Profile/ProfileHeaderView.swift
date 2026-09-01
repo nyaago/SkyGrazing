@@ -22,6 +22,7 @@ struct ProfileHeaderView: View {
                         .modifier(HeaderElementModifier())
                     ProfileDescriptionView(profile: profile)
                         .modifier(HeaderElementModifier())
+                    ProfileCreatedAtView(profile: profile)
                 }
             }
             .modifier(HeaderContentsModifier())
