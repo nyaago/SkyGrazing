@@ -9,27 +9,28 @@ import SwiftUI
 
 struct ProfileHeaderView: View {
     var profile: BskyProfile?
+    @Binding var selectedTab: ProfileTab
+    // ...
     
     var body: some View {
         VStack {
-            VStack {
-                if let profile  {
-                    ProfileNameView(profile: profile)
-                        .modifier(HeaderElementModifier())
-                    ProfileHandleView(profile: profile)
-                        .modifier(HeaderElementModifier())
-                    ProfileStatsView(profile: profile)
-                        .modifier(HeaderElementModifier())
-                    ProfileDescriptionView(profile: profile)
-                        .modifier(HeaderElementModifier())
-                    ProfileCreatedAtView(profile: profile)
-                }
+            if let profile  {
+                ProfileNameView(profile: profile)
+                    .modifier(HeaderElementModifier())
+                ProfileHandleView(profile: profile)
+                    .modifier(HeaderElementModifier())
+                ProfileStatsView(profile: profile)
+                    .modifier(HeaderElementModifier())
+                ProfileDescriptionView(profile: profile)
+                    .modifier(HeaderElementModifier())
+                ProfileCreatedAtView(profile: profile)
+                ProfileTabBarView(selectedTab: $selectedTab)
             }
-            .modifier(HeaderContentsModifier())
         }
+        .modifier(HeaderContentsModifier())
     }
 }
 
 #Preview {
-    ProfileHeaderView()
+    ProfileHeaderView(selectedTab: .constant(.posts))
 }

@@ -13,6 +13,7 @@ struct ProfileView: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel: ProfileViewModel
     @Environment(TimelineRouter.self) private var router
+    @State private var selectedTab: ProfileTab = .posts
 
     init(actor: String) {
         self.actor = actor
@@ -26,7 +27,7 @@ struct ProfileView: View {
             }
             else {
                 if let profile = viewModel.profile {
-                    ProfileHeaderView(profile: profile)
+                    ProfileHeaderView(profile: profile, selectedTab: $selectedTab)
                     FeedView(viewModel: FeedViewModel { limit, cursor in
                         BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
                     })

@@ -25,6 +25,9 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                     viewModel.loadMore(service: service)
                 }
             }
+            .listRowSeparator(.visible, edges: .bottom)
+            .listRowSeparator(.hidden, edges: .top)
+            
         }
         .listStyle(.plain)
         .overlay {
