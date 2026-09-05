@@ -13,7 +13,7 @@ struct ProfileView: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel: ProfileViewModel
     @Environment(TimelineRouter.self) private var router
-    @State private var selectedTab: ProfileTab = .posts
+    @State private var selectedSection: ProfileSection = .posts
 
     init(actor: String) {
         self.actor = actor
@@ -27,15 +27,8 @@ struct ProfileView: View {
             }
             else {
                 if let profile = viewModel.profile {
-                    ProfileHeaderView(profile: profile, selectedTab: $selectedTab)
-                    switch selectedTab {
-                    case .posts, .replies, .media, .likes, .feeds:
-                        // 現状は FeedView のみ。今後タブごとに切り替える
-                        FeedView(viewModel: FeedViewModel { limit, cursor in
-                            BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
-                        })
-                        .environment(\.profileActor, profile.handle)
-                    }
+                    ProfileHeaderView(profile: profile, selectedSection: $selectedSection)
+                    sectionContent
                 }
             }
         }
@@ -43,6 +36,20 @@ struct ProfileView: View {
             router.destination(for: route)
         }
         .onAppear { viewModel.onAppearProfile(service: service) }
+    }
+
+    @ViewBuilder
+    private var sectionContent: some View {
+        if let profile = viewModel.profile {
+            switch selectedSection {
+            case .posts, .replies, .media, .likes, .feeds:
+                // 現状は FeedView のみ。今後セクションごとに切り替える
+                FeedView(viewModel: FeedViewModel { limit, cursor in
+                    BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
+                })
+                .environment(\.profileActor, profile.handle)
+            }
+        }
     }
 }
 

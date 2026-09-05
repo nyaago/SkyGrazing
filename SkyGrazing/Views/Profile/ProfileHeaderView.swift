@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileHeaderView: View {
     var profile: BskyProfile?
-    @Binding var selectedTab: ProfileTab
+    @Binding var selectedSection: ProfileSection
     // ...
     
     var body: some View {
@@ -24,7 +24,7 @@ struct ProfileHeaderView: View {
                 ProfileDescriptionView(profile: profile)
                     .modifier(HeaderElementModifier())
                 ProfileCreatedAtView(profile: profile)
-                ProfileTabBarView(selectedTab: $selectedTab)
+                ProfileSectionBarView(selectedSection: $selectedSection)
             }
         }
         .modifier(HeaderContentsModifier())
@@ -32,5 +32,5 @@ struct ProfileHeaderView: View {
 }
 
 #Preview {
-    ProfileHeaderView(selectedTab: .constant(.posts))
+    ProfileHeaderView(selectedSection: .constant(.posts))
 }

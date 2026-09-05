@@ -1,5 +1,5 @@
 //
-//  ProfileTabBarView.swift
+//  ProfileSectionBarView.swift
 //  SkyGrazing
 //
 //  Created by nyaago on 2026/09/01.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum ProfileTab: String, CaseIterable {
+enum ProfileSection: String, CaseIterable {
     case posts = "Posts"
     case replies = "Replies"
     case media = "Media"
@@ -15,22 +15,22 @@ enum ProfileTab: String, CaseIterable {
     case feeds = "Feeds"
 }
 
-struct ProfileTabBarView: View {
-    @Binding var selectedTab: ProfileTab
+struct ProfileSectionBarView: View {
+    @Binding var selectedSection: ProfileSection
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(ProfileTab.allCases, id: \.self) { tab in
+            ForEach(ProfileSection.allCases, id: \.self) { section in
                 Button {
-                    selectedTab = tab
+                    selectedSection = section
                 } label: {
                     VStack(spacing: 4) {
-                        Text(tab.rawValue)
+                        Text(section.rawValue)
                             .font(.subheadline)
-                            .fontWeight(selectedTab == tab ? .bold : .regular)
-                            .foregroundColor(selectedTab == tab ? .primary : .secondary)
+                            .fontWeight(selectedSection == section ? .bold : .regular)
+                            .foregroundColor(selectedSection == section ? .primary : .secondary)
                         Rectangle()
-                            .fill(selectedTab == tab ? Color.accentColor : Color.clear)
+                            .fill(selectedSection == section ? Color.accentColor : Color.clear)
                             .frame(height: 2)
                     }
                 }
@@ -47,5 +47,5 @@ struct ProfileTabBarView: View {
 }
 
 #Preview {
-    ProfileTabBarView(selectedTab: .constant(.posts))
+    ProfileSectionBarView(selectedSection: .constant(.posts))
 }
