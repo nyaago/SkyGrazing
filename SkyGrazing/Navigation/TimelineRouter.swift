@@ -24,10 +24,10 @@ final class TimelineRouter {
     func destination(for route: TimelineRoute) -> some View {
         switch route {
         case .profile(let author):
-            AuthorFeedView(actor: author.handle)
+            ProfileView(actor: author.handle)
                 .environment(self)
         case .post(let post):
-             ThreadView(uri: post.uri)
+            ThreadView(uri: post.uri)
                 .environment(self)
         }
     }

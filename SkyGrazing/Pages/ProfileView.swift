@@ -8,24 +8,53 @@
 import SwiftUI
 
 struct ProfileView: View {
+    let actor: String
+
     @Environment(BskyService.self) private var service
-    @State private var viewModel = ProfileViewModel()
-    
+    @State private var viewModel: ProfileViewModel
+    @Environment(TimelineRouter.self) private var router
+    @State private var selectedSection: ProfileSection = .posts
+
+    init(actor: String) {
+        self.actor = actor
+        self._viewModel = State(initialValue: ProfileViewModel(handle: actor))
+    }
+
     var body: some View {
         VStack {
-            if let profile = viewModel.profile {
-                Text(profile.displayName ?? UserSettings.handle)
-                    .font(.largeTitle)
-                Text(profile.description ?? "")
-            } else if viewModel.isLoading {
+            if viewModel.isLoadingProfile {
                 ProgressView()
             }
+            else {
+                if let profile = viewModel.profile {
+                    ProfileHeaderView(profile: profile, selectedSection: $selectedSection)
+                    sectionContent
+                }
+            }
         }
-        .onAppear { viewModel.onAppear(handle: UserSettings.handle, service: service) }
+        .navigationDestination(for: TimelineRoute.self) { route in
+            router.destination(for: route)
+        }
+        .onAppear { viewModel.onAppearProfile(service: service) }
+    }
+
+    @ViewBuilder
+    private var sectionContent: some View {
+        if let profile = viewModel.profile {
+            switch selectedSection {
+            case .posts, .replies, .media, .likes, .feeds:
+                // 現状は FeedView のみ。今後セクションごとに切り替える
+                FeedView(viewModel: FeedViewModel { limit, cursor in
+                    BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
+                })
+                .environment(\.profileActor, profile.handle)
+            }
+        }
     }
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(actor: UserSettings.handle)
         .environment(BskyService())
+        .environment(TimelineRouter())
 }
