@@ -28,10 +28,14 @@ struct ProfileView: View {
             else {
                 if let profile = viewModel.profile {
                     ProfileHeaderView(profile: profile, selectedTab: $selectedTab)
-                    FeedView(viewModel: FeedViewModel { limit, cursor in
-                        BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
-                    })
-                    .environment(\.profileActor, profile.handle)
+                    switch selectedTab {
+                    case .posts, .replies, .media, .likes, .feeds:
+                        // 現状は FeedView のみ。今後タブごとに切り替える
+                        FeedView(viewModel: FeedViewModel { limit, cursor in
+                            BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
+                        })
+                        .environment(\.profileActor, profile.handle)
+                    }
                 }
             }
         }
