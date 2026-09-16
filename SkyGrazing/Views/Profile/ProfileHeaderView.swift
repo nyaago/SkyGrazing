@@ -24,10 +24,17 @@ struct ProfileHeaderView: View {
                 ProfileDescriptionView(profile: profile)
                     .modifier(HeaderElementModifier())
                 ProfileCreatedAtView(profile: profile)
-                ProfileSectionBarView(selectedSection: $selectedSection)
+                ProfileSectionBarView(selectedSection: $selectedSection,
+                                      sections: sections(for: profile))
             }
         }
         .modifier(HeaderContentsModifier())
+    }
+
+    /// Likes セクションはログイン中の本人のプロフィールの場合のみ表示する
+    private func sections(for profile: BskyProfile) -> [ProfileSection] {
+        let isOwner = profile.handle == UserSettings.handle
+        return ProfileSection.allCases.filter { $0 != .likes || isOwner }
     }
 }
 

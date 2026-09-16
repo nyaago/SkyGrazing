@@ -17,10 +17,11 @@ enum ProfileSection: String, CaseIterable {
 
 struct ProfileSectionBarView: View {
     @Binding var selectedSection: ProfileSection
+    let sections: [ProfileSection]
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(ProfileSection.allCases, id: \.self) { section in
+            ForEach(sections, id: \.self) { section in
                 Button {
                     selectedSection = section
                 } label: {
@@ -47,5 +48,5 @@ struct ProfileSectionBarView: View {
 }
 
 #Preview {
-    ProfileSectionBarView(selectedSection: .constant(.posts))
+    ProfileSectionBarView(selectedSection: .constant(.posts), sections: ProfileSection.allCases)
 }

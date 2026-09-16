@@ -41,15 +41,36 @@ struct ProfileView: View {
     @ViewBuilder
     private var sectionContent: some View {
         if let profile = viewModel.profile {
+            let isOwner = profile.handle == UserSettings.handle
             switch selectedSection {
-            case .posts, .replies, .media, .likes, .feeds:
-                // 現状は FeedView のみ。今後セクションごとに切り替える
-                FeedView(viewModel: FeedViewModel { limit, cursor in
-                    BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor)
-                })
-                .environment(\.profileActor, profile.handle)
+            case .posts, .media, .feeds:
+                // Media / Feeds は仮で Posts と同じ扱い
+                postsFeed(for: profile, filter: "posts_no_replies")
+            case .replies:
+                postsFeed(for: profile, filter: "posts_with_replies")
+            case .likes:
+                if isOwner {
+                    likesFeed(for: profile)
+                } else {
+                    // Likes は本人のみ表示。非本人の場合は Posts にフォールバック
+                    postsFeed(for: profile, filter: "posts_no_replies")
+                }
             }
         }
+    }
+
+    private func postsFeed(for profile: BskyProfile, filter: String) -> some View {
+        FeedView(viewModel: FeedViewModel { limit, cursor in
+            BskyAuthorFeedRequest(actor: profile.handle, limit: limit, cursor: cursor, filter: filter)
+        })
+        .environment(\.profileActor, profile.handle)
+    }
+
+    private func likesFeed(for profile: BskyProfile) -> some View {
+        FeedView(viewModel: FeedViewModel { limit, cursor in
+            BskyActorLikesRequest(actor: profile.handle, limit: limit, cursor: cursor)
+        })
+        .environment(\.profileActor, profile.handle)
     }
 }
 
