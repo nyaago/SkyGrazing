@@ -23,55 +23,63 @@ struct ContentView: View {
     private let maxMenuWidth: CGFloat = 320
 
     var body: some View {
-        if service.isLoggedIn {
-            GeometryReader { geometry in
-                // 画面幅からメニュー幅を決める（上限あり）
-                let menuWidth = min(geometry.size.width * menuWidthRatio, maxMenuWidth)
-                // 開/閉の基準位置 + ドラッグ量。範囲内にクランプして現在のオフセットを求める。
-                let base = isMenuOpen ? 0 : -menuWidth
-                let offset = min(0, max(-menuWidth, base + dragTranslation))
-                // メニューが開いている割合（0: 非表示, 1: 全表示）
-                let progress = Double((offset + menuWidth) / menuWidth)
+        Group {
+            if service.isLoggedIn {
+                GeometryReader { geometry in
+                    // 画面幅からメニュー幅を決める（上限あり）
+                    let menuWidth = min(geometry.size.width * menuWidthRatio, maxMenuWidth)
+                    // 開/閉の基準位置 + ドラッグ量。範囲内にクランプして現在のオフセットを求める。
+                    let base = isMenuOpen ? 0 : -menuWidth
+                    let offset = min(0, max(-menuWidth, base + dragTranslation))
+                    // メニューが開いている割合（0: 非表示, 1: 全表示）
+                    let progress = Double((offset + menuWidth) / menuWidth)
 
-                ZStack(alignment: .leading) {
-                    TabView {
-                        Tab("Timeline", systemImage: "list.bullet") {
-                            NavigationStack(path: $timelineRouter.path) {
-                                TimelineView()
-                                    .toolbar { menuToolbar }
+                    ZStack(alignment: .leading) {
+                        TabView {
+                            Tab("Timeline", systemImage: "list.bullet") {
+                                NavigationStack(path: $timelineRouter.path) {
+                                    TimelineView()
+                                        .toolbar { menuToolbar }
+                                }
+                                .environment(timelineRouter)
                             }
-                            .environment(timelineRouter)
-                        }
-                        Tab("Profile", systemImage: "person.circle") {
-                            NavigationStack(path: $profileRouter.path) {
-                                ProfileView(actor: UserSettings.handle)
-                                    .toolbar { menuToolbar }
+                            Tab("Profile", systemImage: "person.circle") {
+                                NavigationStack(path: $profileRouter.path) {
+                                    ProfileView(actor: UserSettings.handle)
+                                        .toolbar { menuToolbar }
+                                }
+                                .environment(profileRouter)
                             }
-                            .environment(profileRouter)
                         }
-                    }
-                    .tabViewStyle(.sidebarAdaptable)
-                    .defaultAdaptableTabBarPlacement(.sidebar)
+                        .tabViewStyle(.sidebarAdaptable)
+                        .defaultAdaptableTabBarPlacement(.sidebar)
 
-                    // 開いているときの背景。
-                    if progress > 0 {
-                        Color.black
-                            .opacity(0.3 * progress)
-                            .ignoresSafeArea()
-                    }
+                        // 開いているときの背景。
+                        if progress > 0 {
+                            Color.black
+                                .opacity(0.3 * progress)
+                                .ignoresSafeArea()
+                        }
 
-                    MenuView(width: menuWidth, offset: offset)
+                        MenuView(width: menuWidth, offset: offset)
+                    }
+                    .gesture(menuDragGesture(menuWidth: menuWidth))
+                    .onTapGesture { closeMenu() }
+                    .onAppear {
+                        // ログイン直後などにメニューを閉じた状態から始める
+                        isMenuOpen = false
+                        dragTranslation = 0
+                    }
                 }
-                .gesture(menuDragGesture(menuWidth: menuWidth))
-                .onTapGesture { closeMenu() }
-                .onAppear {
-                    // ログイン直後などにメニューを閉じた状態から始める
-                    isMenuOpen = false
-                    dragTranslation = 0
-                }
+            } else {
+                LoginView()
             }
-        } else {
-            LoginView()
+        }
+        .task {
+            // 未ログインなら、保存済みトークンでのセッション復元を一度だけ試す
+            if !service.isLoggedIn {
+                await service.restoreSession()
+            }
         }
     }
 
