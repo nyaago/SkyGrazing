@@ -14,22 +14,26 @@ struct ContentView: View {
 
     var body: some View {
         if service.isLoggedIn {
-            TabView {
-                Tab("Timeline", systemImage: "list.bullet") {
-                    NavigationStack(path: $timelineRouter.path) {
-                        TimelineView()
+            ZStack {
+                TabView {
+                    Tab("Timeline", systemImage: "list.bullet") {
+                        NavigationStack(path: $timelineRouter.path) {
+                            TimelineView()
+                        }
+                        .environment(timelineRouter)
                     }
-                    .environment(timelineRouter)
-                }
-                Tab("Profile", systemImage: "person.circle") {
-                    NavigationStack(path: $profileRouter.path) {
-                        ProfileView(actor: UserSettings.handle)
+                    Tab("Profile", systemImage: "person.circle") {
+                        NavigationStack(path: $profileRouter.path) {
+                            ProfileView(actor: UserSettings.handle)
+                        }
+                        .environment(profileRouter)
                     }
-                    .environment(profileRouter)
                 }
+                .tabViewStyle(.sidebarAdaptable)
+                .defaultAdaptableTabBarPlacement(.sidebar)
+
+                MenuView()
             }
-            .tabViewStyle(.sidebarAdaptable)
-            .defaultAdaptableTabBarPlacement(.sidebar)
         } else {
             LoginView()
         }
