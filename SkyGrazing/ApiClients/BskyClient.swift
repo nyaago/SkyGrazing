@@ -139,6 +139,45 @@ class BskyClient {
         UserSettings.handle = session.handle
         return session
     }
+    
+    /// Keychain の refreshJwt を Bearer に付けて refreshSession を呼び、
+    /// 新しい accessJwt / refreshJwt を Keychain に保存する。
+    func refreshSession() async throws -> BskySession {
+        guard let refreshToken = KeychainHelper.load(key: Self.refreshTokenKey) else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        let request = BskyRefreshSessionRequest()
+        guard let url = URL(string: baseURL + request.endPoint()) else {
+            throw URLError(.badURL)
+        }
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        // refreshSession は accessJwt ではなく refreshJwt で認証する
+        urlRequest.setValue("Bearer \(refreshToken)", forHTTPHeaderField: "Authorization")
+
+        let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        #if DEBUG
+        printJSON(from: data)
+        #endif
+        do {
+            let session = try JSONDecoder().decode(BskySession.self, from: data)
+            KeychainHelper.save(key: Self.accessTokenKey, value: session.accessJwt)
+            KeychainHelper.save(key: Self.refreshTokenKey, value: session.refreshJwt)
+            UserSettings.handle = session.handle
+            return session
+        } catch {
+            #if DEBUG
+            printError(from: error)
+            #endif
+            throw error
+        }
+    }
+
+    func logout() {
+        KeychainHelper.delete(key: Self.accessTokenKey)
+        KeychainHelper.delete(key: Self.refreshTokenKey)
+    }
    
     var accessToken: String? {
         KeychainHelper.load(key: Self.accessTokenKey)
