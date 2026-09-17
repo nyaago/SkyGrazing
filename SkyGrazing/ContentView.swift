@@ -38,12 +38,14 @@ struct ContentView: View {
                         Tab("Timeline", systemImage: "list.bullet") {
                             NavigationStack(path: $timelineRouter.path) {
                                 TimelineView()
+                                    .toolbar { menuToolbar }
                             }
                             .environment(timelineRouter)
                         }
                         Tab("Profile", systemImage: "person.circle") {
                             NavigationStack(path: $profileRouter.path) {
                                 ProfileView(actor: UserSettings.handle)
+                                    .toolbar { menuToolbar }
                             }
                             .environment(profileRouter)
                         }
@@ -65,6 +67,26 @@ struct ContentView: View {
             }
         } else {
             LoginView()
+        }
+    }
+
+    /// ナビバー左上のハンバーガーボタン。
+    @ToolbarContentBuilder
+    private var menuToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button {
+                toggleMenu()
+            } label: {
+                Image(systemName: "line.3.horizontal")
+            }
+        }
+    }
+
+    /// メニューの開閉を切り替える。
+    private func toggleMenu() {
+        withAnimation(.easeOut(duration: 0.25)) {
+            isMenuOpen.toggle()
+            dragTranslation = 0
         }
     }
 
