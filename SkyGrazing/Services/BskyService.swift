@@ -39,6 +39,17 @@ class BskyService {
         let _ = try await client.login(identifier: identifier, password: password)
         isLoggedIn = true
     }
+
+    /// 起動時などに、保存済みの refreshJwt からセッションを復元する。
+    /// refreshJwt が無い、または更新に失敗した場合は未ログイン状態のままにする。
+    func restoreSession() async {
+        do {
+            let _ = try await client.refreshSession()
+            isLoggedIn = true
+        } catch {
+            isLoggedIn = false
+        }
+    }
     
     private func checkResponse(_ response: BskyResponseCheckable) throws {
         if response.isError {
