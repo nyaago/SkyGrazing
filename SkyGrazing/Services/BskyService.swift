@@ -48,4 +48,10 @@ class BskyService {
             throw BskyApiError.apiError(error: error, message: message)
         }
     }
+    
+    func logout() {
+        client.logout()
+        UserSettings.handle = ""
+        isLoggedIn = false
+    }
 }

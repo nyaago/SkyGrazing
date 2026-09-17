@@ -64,6 +64,11 @@ struct ContentView: View {
                 }
                 .gesture(menuDragGesture(menuWidth: menuWidth))
                 .onTapGesture { closeMenu() }
+                .onAppear {
+                    // ログイン直後などにメニューを閉じた状態から始める
+                    isMenuOpen = false
+                    dragTranslation = 0
+                }
             }
         } else {
             LoginView()

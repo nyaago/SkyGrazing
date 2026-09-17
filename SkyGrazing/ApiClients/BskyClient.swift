@@ -139,6 +139,11 @@ class BskyClient {
         UserSettings.handle = session.handle
         return session
     }
+    
+    func logout() {
+        KeychainHelper.delete(key: Self.accessTokenKey)
+        KeychainHelper.delete(key: Self.refreshTokenKey)
+    }
    
     var accessToken: String? {
         KeychainHelper.load(key: Self.accessTokenKey)

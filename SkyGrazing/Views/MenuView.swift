@@ -11,6 +11,7 @@ import SwiftUI
 /// 幅(width)と表示位置(offset)は呼び出し側から渡され、DragGesture 等の操作も呼び出し側で行う。
 /// 非表示時は offset を -width にしておく。
 struct MenuView: View {
+    @Environment(BskyService.self) private var service
     /// メニューの幅
     let width: CGFloat
 
@@ -33,7 +34,7 @@ struct MenuView: View {
             Divider()
 
             Button(role: .destructive) {
-                // TODO: サインアウト処理は後で実装する
+                logout()
             } label: {
                 Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                     .font(.headline)
@@ -43,6 +44,10 @@ struct MenuView: View {
             .padding(.bottom, 40)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func logout() {
+        service.logout()
     }
 }
 
