@@ -8,52 +8,21 @@
 import SwiftUI
 
 /// 左からスライドして出現するメニュー。
-/// 最初はオフセットをメニュー幅分マイナスして非表示にしておき、
-/// DragGesture でオフセットを変更して表示/非表示を切り替える。
+/// 幅(width)と表示位置(offset)は呼び出し側から渡され、DragGesture 等の操作も呼び出し側で行う。
+/// 非表示時は offset を -width にしておく。
 struct MenuView: View {
-    private enum Layout {
-        /// メニューの幅
-        static let menuWidth: CGFloat = 270
-        /// 閉じているときに左端からのドラッグを検知する透明ストリップの幅
-        static let edgeWidth: CGFloat = 24
-    }
+    /// メニューの幅
+    let width: CGFloat
 
-    /// メニュー本体の現在のオフセット。非表示時は -menuWidth。
-    @State private var offset: CGFloat = -Layout.menuWidth
-    /// ドラッグ確定後のオフセット。ドラッグ中の起点として使う。
-    @State private var committedOffset: CGFloat = -Layout.menuWidth
-    
+    /// メニュー本体の現在のオフセット。非表示時は -width。
+    let offset: CGFloat
+
     var body: some View {
-        // メニューが開いている割合（0: 非表示, 1: 全表示）
-        let progress = Double((offset + Layout.menuWidth) / Layout.menuWidth)
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                // 開いているときの背景。タップで閉じる。
-                if progress > 0 {
-                    Color.black
-                        .opacity(0.3 * progress)
-                        .ignoresSafeArea()
-                        .onTapGesture { close() }
-                }
-                
-                // 閉じているときに左端からのドラッグを検知する透明ストリップ
-                if progress <= 0 {
-                    Color.clear
-                        .frame(width: Layout.edgeWidth)
-                        .frame(maxHeight: .infinity)
-                        .contentShape(Rectangle())
-                        .gesture(dragGesture)
-                }
-                
-                // メニュー本体
-                menuContent
-                    .frame(width: Layout.menuWidth)
-                    .frame(maxHeight: .infinity)
-                    .background(.regularMaterial)
-                    .offset(x: offset)
-                    .gesture(dragGesture)
-            }
-        }
+        menuContent
+            .frame(width: width)
+            .frame(maxHeight: .infinity)
+            .background(.regularMaterial)
+            .offset(x: offset)
     }
 
     /// メニュー内のコンテンツ。一番下に Sign Out ボタンを配置する。
@@ -75,32 +44,8 @@ struct MenuView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-
-    /// メニューのオフセットを変更するドラッグ操作。
-    private var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                let proposed = committedOffset + value.translation.width
-                offset = min(0, max(-Layout.menuWidth, proposed))
-            }
-            .onEnded { _ in
-                // ドラッグ量が半分を超えていれば開く、そうでなければ閉じる。
-                withAnimation(.easeOut(duration: 0.25)) {
-                    offset = offset > -Layout.menuWidth / 2 ? 0 : -Layout.menuWidth
-                }
-                committedOffset = offset > -Layout.menuWidth / 2 ? 0 : -Layout.menuWidth
-            }
-    }
-
-    /// メニューを閉じる。
-    private func close() {
-        withAnimation(.easeOut(duration: 0.25)) {
-            offset = -Layout.menuWidth
-        }
-        committedOffset = -Layout.menuWidth
-    }
 }
 
 #Preview {
-    MenuView()
+    MenuView(width: 270, offset: 0)
 }
