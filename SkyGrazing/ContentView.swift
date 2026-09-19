@@ -7,10 +7,19 @@
 
 import SwiftUI
 
+/// TabView で切り替えるタブ。
+enum AppTab: Hashable {
+    case timeline
+    case profile
+}
+
 struct ContentView: View {
     @Environment(BskyService.self) private var service
     @State var timelineRouter: TimelineRouter = .init()
     @State var profileRouter: TimelineRouter = .init()
+
+    /// 現在選択中のタブ
+    @State private var selectedTab: AppTab = .timeline
 
     /// メニューが開いているか
     @State private var isMenuOpen = false
@@ -35,15 +44,15 @@ struct ContentView: View {
                     let progress = Double((offset + menuWidth) / menuWidth)
 
                     ZStack(alignment: .leading) {
-                        TabView {
-                            Tab("Timeline", systemImage: "list.bullet") {
+                        TabView(selection: $selectedTab) {
+                            Tab("Timeline", systemImage: "list.bullet", value: AppTab.timeline) {
                                 NavigationStack(path: $timelineRouter.path) {
                                     TimelineView()
                                         .toolbar { menuToolbar }
                                 }
                                 .environment(timelineRouter)
                             }
-                            Tab("Profile", systemImage: "person.circle") {
+                            Tab("Profile", systemImage: "person.circle", value: AppTab.profile) {
                                 NavigationStack(path: $profileRouter.path) {
                                     ProfileView(actor: UserSettings.handle)
                                         .toolbar { menuToolbar }
@@ -61,7 +70,11 @@ struct ContentView: View {
                                 .ignoresSafeArea()
                         }
 
-                        MenuView(width: menuWidth, offset: offset)
+                        MenuView(width: menuWidth, offset: offset) {
+                            // アカウント名/ハンドルのタップで Profile タブへ切り替えて閉じる
+                            selectedTab = .profile
+                            closeMenu()
+                        }
                     }
                     .gesture(menuDragGesture(menuWidth: menuWidth))
                     .onTapGesture { closeMenu() }
