@@ -39,11 +39,11 @@ struct MenuView: View {
             accountHeader
                 .padding(.horizontal)
                 .padding(.top, 60)
-            Divider()
+            ThickDivider()
 
             Spacer()
 
-            Divider()
+            ThickDivider()
 
             Button(role: .destructive) {
                 logout()
