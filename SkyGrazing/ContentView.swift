@@ -44,24 +44,7 @@ struct ContentView: View {
                     let progress = Double((offset + menuWidth) / menuWidth)
 
                     ZStack(alignment: .leading) {
-                        TabView(selection: $selectedTab) {
-                            Tab("Timeline", systemImage: "list.bullet", value: AppTab.timeline) {
-                                NavigationStack(path: $timelineRouter.path) {
-                                    TimelineView()
-                                        .toolbar { menuToolbar }
-                                }
-                                .environment(timelineRouter)
-                            }
-                            Tab("Profile", systemImage: "person.circle", value: AppTab.profile) {
-                                NavigationStack(path: $profileRouter.path) {
-                                    ProfileView(actor: UserSettings.handle)
-                                        .toolbar { menuToolbar }
-                                }
-                                .environment(profileRouter)
-                            }
-                        }
-                        .tabViewStyle(.sidebarAdaptable)
-                        .defaultAdaptableTabBarPlacement(.sidebar)
+                        tabView
 
                         // 開いているときの背景。
                         if progress > 0 {
@@ -70,11 +53,7 @@ struct ContentView: View {
                                 .ignoresSafeArea()
                         }
 
-                        MenuView(width: menuWidth, offset: offset) {
-                            // アカウント名/ハンドルのタップで Profile タブへ切り替えて閉じる
-                            selectedTab = .profile
-                            closeMenu()
-                        }
+                        menuView(width: menuWidth, offset: offset)
                     }
                     .gesture(menuDragGesture(menuWidth: menuWidth))
                     .onTapGesture { closeMenu() }
@@ -89,10 +68,45 @@ struct ContentView: View {
             }
         }
         .task {
-            // 未ログインなら、保存済みトークンでのセッション復元を一度だけ試す
-            if !service.isLoggedIn {
-                await service.restoreSession()
+            await restoreSessionIfNeeded()
+        }
+    }
+
+    /// 未ログインなら、保存済みトークンでのセッション復元を一度だけ試す。
+    private func restoreSessionIfNeeded() async {
+        if !service.isLoggedIn {
+            await service.restoreSession()
+        }
+    }
+
+    /// タブ切り替え表示（Timeline / Profile）。
+    private var tabView: some View {
+        TabView(selection: $selectedTab) {
+            Tab("Timeline", systemImage: "list.bullet", value: AppTab.timeline) {
+                NavigationStack(path: $timelineRouter.path) {
+                    TimelineView()
+                        .toolbar { menuToolbar }
+                }
+                .environment(timelineRouter)
             }
+            Tab("Profile", systemImage: "person.circle", value: AppTab.profile) {
+                NavigationStack(path: $profileRouter.path) {
+                    ProfileView(actor: UserSettings.handle)
+                        .toolbar { menuToolbar }
+                }
+                .environment(profileRouter)
+            }
+        }
+        .tabViewStyle(.sidebarAdaptable)
+        .defaultAdaptableTabBarPlacement(.sidebar)
+    }
+
+    /// スライド式のサイドメニュー。
+    private func menuView(width: CGFloat, offset: CGFloat) -> some View {
+        MenuView(width: width, offset: offset) {
+            // アカウント名/ハンドルのタップで Profile タブへ切り替えて閉じる
+            selectedTab = .profile
+            closeMenu()
         }
     }
 
