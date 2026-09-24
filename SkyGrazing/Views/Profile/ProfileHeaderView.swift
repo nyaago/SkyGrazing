@@ -10,8 +10,10 @@ import SwiftUI
 struct ProfileHeaderView: View {
     var profile: BskyProfile?
     @Binding var selectedSection: ProfileSection
+    /// Followers 数のタップで呼ばれる。フォロワー一覧の表示に使う。
+    var onSelectFollowers: () -> Void = {}
     // ...
-    
+
     var body: some View {
         VStack {
             if let profile  {
@@ -19,7 +21,7 @@ struct ProfileHeaderView: View {
                     .modifier(HeaderElementModifier())
                 ProfileHandleView(profile: profile)
                     .modifier(HeaderElementModifier())
-                ProfileStatsView(profile: profile)
+                ProfileStatsView(profile: profile, onSelectFollowers: onSelectFollowers)
                     .modifier(HeaderElementModifier())
                 ProfileDescriptionView(profile: profile)
                     .modifier(HeaderElementModifier())
