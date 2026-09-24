@@ -14,6 +14,8 @@ struct ProfileView: View {
     @State private var viewModel: ProfileViewModel
     @Environment(TimelineRouter.self) private var router
     @State private var selectedSection: ProfileSection = .posts
+    /// フォロワー一覧のフローティング表示中か
+    @State private var showFollowers = false
 
     init(actor: String) {
         self.actor = actor
@@ -21,21 +23,44 @@ struct ProfileView: View {
     }
 
     var body: some View {
-        VStack {
-            if viewModel.isLoadingProfile {
-                ProgressView()
-            }
-            else {
-                if let profile = viewModel.profile {
-                    ProfileHeaderView(profile: profile, selectedSection: $selectedSection)
-                    sectionContent
+        ZStack {
+            VStack {
+                if viewModel.isLoadingProfile {
+                    ProgressView()
                 }
+                else {
+                    if let profile = viewModel.profile {
+                        ProfileHeaderView(profile: profile,
+                                          selectedSection: $selectedSection,
+                                          onSelectFollowers: { showFollowers = true })
+                        sectionContent
+                    }
+                }
+            }
+
+            if showFollowers {
+                followersOverlay
             }
         }
         .navigationDestination(for: TimelineRoute.self) { route in
             router.destination(for: route)
         }
         .onAppear { viewModel.onAppearProfile(service: service) }
+    }
+
+    /// メインコンテンツの上に重ねるフォロワー一覧。縦は中央60%、横は100%。
+    private var followersOverlay: some View {
+        GeometryReader { geo in
+            ZStack {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture { showFollowers = false }
+
+                FollowersView(actor: actor) { showFollowers = false }
+                    .frame(width: geo.size.width, height: geo.size.height * 0.6)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2)
+            }
+        }
     }
 
     @ViewBuilder

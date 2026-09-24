@@ -20,12 +20,16 @@ where Request.Response: BskyProfileListResponse {
     private var cursor: String?
     private var hasMore = true
 
-    private var limit: Int = 50
-    private var moreLimit: Int = 30
+    private var limit: Int
+    private var moreLimit: Int
 
     private let makeRequest: (_ limit: Int?, _ cursor: String?) -> Request
 
-    init(makeRequest: @escaping (_ limit: Int?, _ cursor: String?) -> Request) {
+    init(limit: Int = 30,
+         moreLimit: Int = 20,
+         makeRequest: @escaping (_ limit: Int?, _ cursor: String?) -> Request) {
+        self.limit = limit
+        self.moreLimit = moreLimit
         self.makeRequest = makeRequest
     }
 
