@@ -133,15 +133,16 @@ struct ContentView: View {
         selectedTab == .timeline ? timelineRouter : profileRouter
     }
 
-    /// メインコンテンツの上に重ねるフォロワー一覧（メニュー起点）。
+    /// メインコンテンツの上に重ねるフォロワー一覧（メニュー起点）。下部に配置し、高さは最大60%。
     private func followersOverlay(width: CGFloat, height: CGFloat) -> some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
                 .onTapGesture { showFollowers = false }
 
             FollowersView(actor: UserSettings.handle) { showFollowers = false }
-                .frame(width: width, height: height * 0.6)
+                .frame(width: width)
+                .frame(maxHeight: height * 0.6)
         }
         .frame(width: width, height: height)
         .environment(activeRouter)
