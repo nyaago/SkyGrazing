@@ -12,6 +12,8 @@ struct ProfileHeaderView: View {
     @Binding var selectedSection: ProfileSection
     /// Followers 数のタップで呼ばれる。フォロワー一覧の表示に使う。
     var onSelectFollowers: () -> Void = {}
+    /// Following 数のタップで呼ばれる。フォロー一覧の表示に使う。
+    var onSelectFollows: () -> Void = {}
     // ...
 
     var body: some View {
@@ -21,7 +23,9 @@ struct ProfileHeaderView: View {
                     .modifier(HeaderElementModifier())
                 ProfileHandleView(profile: profile)
                     .modifier(HeaderElementModifier())
-                ProfileStatsView(profile: profile, onSelectFollowers: onSelectFollowers)
+                ProfileStatsView(profile: profile,
+                                 onSelectFollowers: onSelectFollowers,
+                                 onSelectFollows: onSelectFollows)
                     .modifier(HeaderElementModifier())
                 ProfileDescriptionView(profile: profile)
                     .modifier(HeaderElementModifier())

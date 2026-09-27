@@ -16,6 +16,8 @@ struct ProfileView: View {
     @State private var selectedSection: ProfileSection = .posts
     /// フォロワー一覧のフローティング表示中か
     @State private var showFollowers = false
+    /// フォロー一覧のフローティング表示中か
+    @State private var showFollows = false
 
     init(actor: String) {
         self.actor = actor
@@ -32,7 +34,8 @@ struct ProfileView: View {
                     if let profile = viewModel.profile {
                         ProfileHeaderView(profile: profile,
                                           selectedSection: $selectedSection,
-                                          onSelectFollowers: { showFollowers = true })
+                                          onSelectFollowers: { showFollowers = true },
+                                          onSelectFollows: { showFollows = true })
                         sectionContent
                     }
                 }
@@ -40,6 +43,10 @@ struct ProfileView: View {
 
             if showFollowers {
                 followersOverlay
+            }
+
+            if showFollows {
+                followsOverlay
             }
         }
         .navigationDestination(for: TimelineRoute.self) { route in
@@ -57,6 +64,21 @@ struct ProfileView: View {
                     .onTapGesture { showFollowers = false }
 
                 FollowersView(actor: actor) { showFollowers = false }
+                    .frame(width: geo.size.width)
+                    .frame(maxHeight: geo.size.height * 0.6)
+            }
+        }
+    }
+
+    /// メインコンテンツの上に重ねるフォロー一覧。下部に配置し、高さは最大60%、横は100%。
+    private var followsOverlay: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .bottom) {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture { showFollows = false }
+
+                FollowsView(actor: actor) { showFollows = false }
                     .frame(width: geo.size.width)
                     .frame(maxHeight: geo.size.height * 0.6)
             }

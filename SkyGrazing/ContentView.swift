@@ -28,6 +28,8 @@ struct ContentView: View {
 
     /// フォロワー一覧のフローティング表示中か（メニューからの表示用）
     @State private var showFollowers = false
+    /// フォロー一覧のフローティング表示中か（メニューからの表示用）
+    @State private var showFollows = false
 
     /// 画面幅に対するメニュー幅の割合
     private let menuWidthRatio: CGFloat = 0.75
@@ -62,6 +64,12 @@ struct ContentView: View {
                         if showFollowers {
                             followersOverlay(width: geometry.size.width,
                                              height: geometry.size.height)
+                        }
+
+                        // メニューの Following から開くフォロー一覧（縦は中央60%、横は100%）。
+                        if showFollows {
+                            followsOverlay(width: geometry.size.width,
+                                           height: geometry.size.height)
                         }
                     }
                     .gesture(menuDragGesture(menuWidth: menuWidth))
@@ -124,6 +132,11 @@ struct ContentView: View {
                 // Followers のタップでメニューを閉じてフォロワー一覧を重ねて表示
                 closeMenu()
                 showFollowers = true
+            },
+            onSelectFollows: {
+                // Following のタップでメニューを閉じてフォロー一覧を重ねて表示
+                closeMenu()
+                showFollows = true
             }
         )
     }
@@ -141,6 +154,21 @@ struct ContentView: View {
                 .onTapGesture { showFollowers = false }
 
             FollowersView(actor: UserSettings.handle) { showFollowers = false }
+                .frame(width: width)
+                .frame(maxHeight: height * 0.6)
+        }
+        .frame(width: width, height: height)
+        .environment(activeRouter)
+    }
+
+    /// メインコンテンツの上に重ねるフォロー一覧（メニュー起点）。下部に配置し、高さは最大60%。
+    private func followsOverlay(width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .bottom) {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { showFollows = false }
+
+            FollowsView(actor: UserSettings.handle) { showFollows = false }
                 .frame(width: width)
                 .frame(maxHeight: height * 0.6)
         }

@@ -24,6 +24,9 @@ struct MenuView: View {
     /// Followers のタップでフォロワー一覧を表示する。
     var onSelectFollowers: () -> Void = {}
 
+    /// Following のタップでフォロー一覧を表示する。
+    var onSelectFollows: () -> Void = {}
+
     /// メニューに表示する自分のプロフィール。
     @State private var profile: BskyProfile?
 
@@ -86,8 +89,10 @@ struct MenuView: View {
                     Text("\(followersCount) Followers")
                         .modifier(CellActionButtonModifier())
                 }
-                Text("\(followsCount) Following")
-                    .modifier(CellActionButtonModifier())
+                Button(action: onSelectFollows) {
+                    Text("\(followsCount) Following")
+                        .modifier(CellActionButtonModifier())
+                }
             }
             .modifier(HeaderElementModifier())
         }
