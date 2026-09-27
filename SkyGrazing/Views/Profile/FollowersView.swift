@@ -82,7 +82,8 @@ struct FollowersView: View {
             onDismiss()
         } label: {
             HStack(spacing: 0) {
-                avatar(for: profile)
+                ProfileAvatarView(avatar: profile.avatar)
+                    .padding(.horizontal, 8)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(profile.displayName ?? profile.handle)
                         .modifier(HeadlineModifier())
@@ -90,9 +91,7 @@ struct FollowersView: View {
                         .modifier(CaptionModifier())
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "chevron.right")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+                DisclosureArrowView()
             }
         }
         .buttonStyle(.plain)
@@ -104,30 +103,6 @@ struct FollowersView: View {
             return false
         }
         return index >= viewModel.profiles.count - 3
-    }
-    
-    @ViewBuilder
-    private func avatar(for profile: BskyProfile) -> some View {
-        if let avatar = profile.avatar {
-            AsyncImage(url: URL(string: avatar))
-            //.resizable()
-                .scaledToFit()
-                .frame(width: 40, height: 40)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.white.opacity(0.15)))
-                .padding(.leading, 8)
-                .padding(.trailing, 8)
-        }
-        else {
-            Color.gray
-                .scaledToFit()
-                .frame(width: 40, height: 40)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.white.opacity(0.15)))
-                .padding(.leading, 8)
-                .padding(.trailing, 8)
-
-        }
     }
 }
 
