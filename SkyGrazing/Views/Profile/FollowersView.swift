@@ -81,13 +81,19 @@ struct FollowersView: View {
             router.push(.profile(profile.asProfileViewBasic))
             onDismiss()
         } label: {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(profile.displayName ?? profile.handle)
-                    .modifier(HeadlineModifier())
-                Text("@" + profile.handle)
-                    .modifier(CaptionModifier())
+            HStack(spacing: 0) {
+                avatar(for: profile)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(profile.displayName ?? profile.handle)
+                        .modifier(HeadlineModifier())
+                    Text("@" + profile.handle)
+                        .modifier(CaptionModifier())
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.right")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.plain)
     }
@@ -98,6 +104,30 @@ struct FollowersView: View {
             return false
         }
         return index >= viewModel.profiles.count - 3
+    }
+    
+    @ViewBuilder
+    private func avatar(for profile: BskyProfile) -> some View {
+        if let avatar = profile.avatar {
+            AsyncImage(url: URL(string: avatar))
+            //.resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.15)))
+                .padding(.leading, 8)
+                .padding(.trailing, 8)
+        }
+        else {
+            Color.gray
+                .scaledToFit()
+                .frame(width: 40, height: 40)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white.opacity(0.15)))
+                .padding(.leading, 8)
+                .padding(.trailing, 8)
+
+        }
     }
 }
 
