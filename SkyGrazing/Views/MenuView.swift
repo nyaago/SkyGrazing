@@ -21,6 +21,12 @@ struct MenuView: View {
     /// アカウント名・ハンドルのタップで ProfileView のタブへ切り替える。
     var onSelectProfile: () -> Void = {}
 
+    /// Followers のタップでフォロワー一覧を表示する。
+    var onSelectFollowers: () -> Void = {}
+
+    /// Following のタップでフォロー一覧を表示する。
+    var onSelectFollows: () -> Void = {}
+
     /// メニューに表示する自分のプロフィール。
     @State private var profile: BskyProfile?
 
@@ -77,12 +83,16 @@ struct MenuView: View {
             }
             .modifier(HeaderElementModifier())
 
-            // フォロワー数・フォロー数（今はテキストのみ）
+            // フォロワー数・フォロー数
             HStack(spacing: 12) {
-                Text("\(followersCount) Followers")
-                    .modifier(CellActionButtonModifier())
-                Text("\(followsCount) Following")
-                    .modifier(CellActionButtonModifier())
+                Button(action: onSelectFollowers) {
+                    Text("\(followersCount) Followers")
+                        .modifier(CellActionButtonModifier())
+                }
+                Button(action: onSelectFollows) {
+                    Text("\(followsCount) Following")
+                        .modifier(CellActionButtonModifier())
+                }
             }
             .modifier(HeaderElementModifier())
         }

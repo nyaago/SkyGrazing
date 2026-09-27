@@ -9,14 +9,18 @@ import SwiftUI
 
 struct ProfileStatsView: View {
     var profile: BskyProfile?
+    /// Followers 数のタップで呼ばれる。フォロワー一覧の表示に使う。
+    var onSelectFollowers: () -> Void = {}
+    /// Following 数のタップで呼ばれる。フォロー一覧の表示に使う。
+    var onSelectFollows: () -> Void = {}
 
     var body: some View {
         HStack {
             ProfileFollowersView(profile: profile) {
-                // TODO: navigation
+                onSelectFollowers()
             }
             ProfileFollowsView(profile: profile) {
-                // TODO: navigation
+                onSelectFollows()
             }
             ProfilePostsView(profile: profile) {
                 // TODO: navigation

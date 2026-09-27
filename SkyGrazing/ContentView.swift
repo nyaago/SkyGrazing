@@ -26,6 +26,11 @@ struct ContentView: View {
     /// ドラッグ中の移動量（指の移動量）
     @State private var dragTranslation: CGFloat = 0
 
+    /// フォロワー一覧のフローティング表示中か（メニューからの表示用）
+    @State private var showFollowers = false
+    /// フォロー一覧のフローティング表示中か（メニューからの表示用）
+    @State private var showFollows = false
+
     /// 画面幅に対するメニュー幅の割合
     private let menuWidthRatio: CGFloat = 0.75
     /// メニュー幅の上限
@@ -54,6 +59,18 @@ struct ContentView: View {
                         }
 
                         menuView(width: menuWidth, offset: offset)
+
+                        // メニューの Followers から開くフォロワー一覧（縦は中央60%、横は100%）。
+                        if showFollowers {
+                            followersOverlay(width: geometry.size.width,
+                                             height: geometry.size.height)
+                        }
+
+                        // メニューの Following から開くフォロー一覧（縦は中央60%、横は100%）。
+                        if showFollows {
+                            followsOverlay(width: geometry.size.width,
+                                           height: geometry.size.height)
+                        }
                     }
                     .gesture(menuDragGesture(menuWidth: menuWidth))
                     .onTapGesture { closeMenu() }
@@ -103,11 +120,60 @@ struct ContentView: View {
 
     /// スライド式のサイドメニュー。
     private func menuView(width: CGFloat, offset: CGFloat) -> some View {
-        MenuView(width: width, offset: offset) {
-            // アカウント名/ハンドルのタップで Profile タブへ切り替えて閉じる
-            selectedTab = .profile
-            closeMenu()
+        MenuView(
+            width: width,
+            offset: offset,
+            onSelectProfile: {
+                // アカウント名/ハンドルのタップで Profile タブへ切り替えて閉じる
+                selectedTab = .profile
+                closeMenu()
+            },
+            onSelectFollowers: {
+                // Followers のタップでメニューを閉じてフォロワー一覧を重ねて表示
+                closeMenu()
+                showFollowers = true
+            },
+            onSelectFollows: {
+                // Following のタップでメニューを閉じてフォロー一覧を重ねて表示
+                closeMenu()
+                showFollows = true
+            }
+        )
+    }
+
+    /// 現在表示中のタブに対応するルーター。フォロワー選択時の遷移先に使う。
+    private var activeRouter: TimelineRouter {
+        selectedTab == .timeline ? timelineRouter : profileRouter
+    }
+
+    /// メインコンテンツの上に重ねるフォロワー一覧（メニュー起点）。下部に配置し、高さは最大60%。
+    private func followersOverlay(width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .bottom) {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { showFollowers = false }
+
+            FollowersView(actor: UserSettings.handle) { showFollowers = false }
+                .frame(width: width)
+                .frame(maxHeight: height * 0.75)
         }
+        .frame(width: width, height: height)
+        .environment(activeRouter)
+    }
+
+    /// メインコンテンツの上に重ねるフォロー一覧（メニュー起点）。下部に配置し、高さは最大60%。
+    private func followsOverlay(width: CGFloat, height: CGFloat) -> some View {
+        ZStack(alignment: .bottom) {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { showFollows = false }
+
+            FollowsView(actor: UserSettings.handle) { showFollows = false }
+                .frame(width: width)
+                .frame(maxHeight: height * 0.75)
+        }
+        .frame(width: width, height: height)
+        .environment(activeRouter)
     }
 
     /// ナビバー左上のハンバーガーボタン。
