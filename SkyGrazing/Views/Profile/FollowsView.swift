@@ -31,7 +31,7 @@ struct FollowsView: View {
             ThickDivider()
             content
         }
-        .background(.regularMaterial)
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(radius: 10)
         .onAppear { viewModel.onAppear(service: service) }

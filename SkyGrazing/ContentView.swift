@@ -155,7 +155,7 @@ struct ContentView: View {
 
             FollowersView(actor: UserSettings.handle) { showFollowers = false }
                 .frame(width: width)
-                .frame(maxHeight: height * 0.6)
+                .frame(maxHeight: height * 0.75)
         }
         .frame(width: width, height: height)
         .environment(activeRouter)
@@ -170,7 +170,7 @@ struct ContentView: View {
 
             FollowsView(actor: UserSettings.handle) { showFollows = false }
                 .frame(width: width)
-                .frame(maxHeight: height * 0.6)
+                .frame(maxHeight: height * 0.75)
         }
         .frame(width: width, height: height)
         .environment(activeRouter)

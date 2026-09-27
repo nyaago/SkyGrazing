@@ -65,7 +65,7 @@ struct ProfileView: View {
 
                 FollowersView(actor: actor) { showFollowers = false }
                     .frame(width: geo.size.width)
-                    .frame(maxHeight: geo.size.height * 0.6)
+                    .frame(maxHeight: geo.size.height * 0.75)
             }
         }
     }
@@ -80,7 +80,7 @@ struct ProfileView: View {
 
                 FollowsView(actor: actor) { showFollows = false }
                     .frame(width: geo.size.width)
-                    .frame(maxHeight: geo.size.height * 0.6)
+                    .frame(maxHeight: geo.size.height * 0.75)
             }
         }
     }
