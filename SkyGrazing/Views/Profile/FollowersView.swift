@@ -31,9 +31,7 @@ struct FollowersView: View {
             ThickDivider()
             content
         }
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 10)
+        .modifier(OverlayViewModifier())
         .onAppear { viewModel.onAppear(service: service) }
     }
 
@@ -44,14 +42,9 @@ struct FollowersView: View {
                 .modifier(HeaderTitleModifier())
             HStack {
                 Spacer()
-                Button(action: onDismiss) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                }
+                CloseButtonView(action: onDismiss)
             }
             .padding(.horizontal)
-            
         }
         .padding(.vertical, 12)
     }
