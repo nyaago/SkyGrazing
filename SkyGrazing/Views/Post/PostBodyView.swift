@@ -21,5 +21,6 @@ struct PostBodyView: View {
             }
             .buttonStyle(.plain)
         }
+        .openLinksInApp()
     }
 }

@@ -15,5 +15,6 @@ struct CurrentPostBodyView: View {
             Text(post.record.attributedText)
                 .modifier(BodyTextModifier())
         }
+        .openLinksInApp()
     }
 }
