@@ -23,9 +23,11 @@ private struct InAppBrowserModifier: ViewModifier {
                 browserURL = IdentifiableURL(url: url)
                 return .handled
             })
-            .sheet(item: $browserURL) { item in
-                SafariView(url: item.url)
-                    .ignoresSafeArea()
+            .fullScreenCover(item: $browserURL) { item in
+                SafariView(url: item.url) {
+                    browserURL = nil
+                }
+                .ignoresSafeArea()
             }
     }
 }
