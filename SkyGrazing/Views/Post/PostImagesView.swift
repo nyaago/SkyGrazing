@@ -15,25 +15,60 @@ import SwiftUI
 struct PostImagesView: View {
     let images: [BskyImage]
 
+    /// この幅を超える画面では画像領域を絞る際の基準幅。
+    private let wideThreshold: CGFloat = 600
+    /// 基準幅を超えた場合に使用する横幅の割合。
+    private let wideWidthRatio: CGFloat = 0.8
+
     private let spacing: CGFloat = 3
     private let cornerRadius: CGFloat = 10
 
+    /// 利用可能な横幅（計測値）。
+    @State private var containerWidth: CGFloat = 0
+
     var body: some View {
-        Group {
-            switch images.count {
-            case 0:
-                EmptyView()
-            case 1:
-                singleLayout
-            case 2:
-                doubleLayout
-            case 3:
-                tripleLayout
-            default:
-                quadLayout
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            // 利用可能な横幅を計測する（フル幅・高さ 0 なのでレイアウトに影響しない）。
+            Color.clear
+                .frame(height: 0)
+                .frame(maxWidth: .infinity)
+                .background {
+                    GeometryReader { geo in
+                        Color.clear
+                            .onAppear { containerWidth = geo.size.width }
+                            .onChange(of: geo.size.width) { _, newValue in
+                                containerWidth = newValue
+                            }
+                    }
+                }
+
+            layoutContent
+                .frame(maxWidth: displayWidth, alignment: .leading)
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         }
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+
+    /// 枚数に応じたレイアウト本体。
+    @ViewBuilder
+    private var layoutContent: some View {
+        switch images.count {
+        case 0:
+            EmptyView()
+        case 1:
+            singleLayout
+        case 2:
+            doubleLayout
+        case 3:
+            tripleLayout
+        default:
+            quadLayout
+        }
+    }
+
+    /// 表示に使う横幅の上限。画面が広い場合のみ 80% に絞る。
+    private var displayWidth: CGFloat {
+        guard containerWidth > wideThreshold else { return .infinity }
+        return containerWidth * wideWidthRatio
     }
 
     // MARK: - レイアウト
