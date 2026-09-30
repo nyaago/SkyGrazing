@@ -48,6 +48,7 @@ struct BskyPostView: Codable, Hashable {
     let quoteCount: Int?
     let indexedAt: String?
     let labels: [BskyLabel]?
+    let embed: BskyEmbed?
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(cid)
@@ -56,6 +57,40 @@ struct BskyPostView: Codable, Hashable {
     static func == (lhs: BskyPostView, rhs: BskyPostView) -> Bool {
         lhs.cid == rhs.cid
     }
+}
+
+// MARK: - app.bsky.embed.images#view
+
+/// 投稿に添付された画像などの埋め込みコンテンツ。
+/// `$type` が `app.bsky.embed.images#view` の場合、`images` に画像一覧を持つ。
+struct BskyEmbed: Codable {
+    let type: String?
+    let images: [BskyImage]?
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case images
+    }
+}
+
+// MARK: - app.bsky.embed.images#viewImage
+
+/// 埋め込み画像 1 枚分の情報。
+struct BskyImage: Codable {
+    /// サムネイル画像の URL。
+    let thumb: String?
+    /// フルサイズ画像の URL。
+    let fullsize: String?
+    /// 代替テキスト。
+    let alt: String?
+    /// 画像の縦横比。
+    let aspectRatio: BskyAspectRatio?
+}
+
+/// 画像の縦横比（ピクセル単位）。
+struct BskyAspectRatio: Codable {
+    let width: Int
+    let height: Int
 }
 
 // MARK: - app.bsky.feed.post (record)
