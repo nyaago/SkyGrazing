@@ -16,10 +16,11 @@ struct PostBodyView: View {
             Button {
                 router.push(.post(post))
             } label: {
-                Text(post.record.text ?? "")
+                Text(post.record.attributedText)
                     .modifier(BodyTextModifier())
             }
             .buttonStyle(.plain)
         }
+        .openLinksInApp()
     }
 }

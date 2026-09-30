@@ -12,8 +12,9 @@ struct CurrentPostBodyView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(post.record.text ?? "")
+            Text(post.record.attributedText)
                 .modifier(BodyTextModifier())
         }
+        .openLinksInApp()
     }
 }

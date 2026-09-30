@@ -65,12 +65,48 @@ struct BskyPostRecord: Codable {
     let text: String?
     let createdAt: String?
     let langs: [String]?
+    let facets: [BskyFacet]?
 
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case text
         case createdAt
         case langs
+        case facets
+    }
+}
+
+// MARK: - app.bsky.richtext.facet
+
+/// テキストの一部（バイト範囲）に付与されるリッチテキスト情報。
+/// リンク・メンション・ハッシュタグなどを `features` として持つ。
+struct BskyFacet: Codable {
+    let index: BskyFacetIndex
+    let features: [BskyFacetFeature]
+}
+
+/// facet が対象とするテキストのバイト範囲。UTF-8 バイト単位のオフセット。
+struct BskyFacetIndex: Codable {
+    let byteStart: Int
+    let byteEnd: Int
+}
+
+/// facet の機能。`$type` によって link / mention / tag を表し、
+/// 種類ごとに使うフィールドが異なる（link は `uri`、mention は `did`、tag は `tag`）。
+struct BskyFacetFeature: Codable {
+    let type: String?
+    /// app.bsky.richtext.facet#link の外部 URL。
+    let uri: String?
+    /// app.bsky.richtext.facet#mention の対象アカウント DID。
+    let did: String?
+    /// app.bsky.richtext.facet#tag のハッシュタグ文字列。
+    let tag: String?
+
+    enum CodingKeys: String, CodingKey {
+        case type = "$type"
+        case uri
+        case did
+        case tag
     }
 }
 
