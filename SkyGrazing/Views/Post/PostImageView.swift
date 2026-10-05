@@ -15,10 +15,13 @@ struct PostImageView: View {
     /// 縦横比を維持して収める場合は `.fit` を指定する。
     var contentMode: ContentMode = .fill
 
+    /// 全画面ポップアップの表示状態。
+    @State private var isPresentingDetail = false
+
     var body: some View {
         if let urlString = image.thumb, let url = URL(string: urlString) {
             Button(action: {
-                print("tapped image at url :\(url)")
+                isPresentingDetail = true
             }) {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -34,6 +37,9 @@ struct PostImageView: View {
                 }
             }
             .buttonStyle(.plain)
+            .fullScreenCover(isPresented: $isPresentingDetail) {
+                PostImageDetailView(image: image)
+            }
 
         } else {
             Color.gray.opacity(0.2)
