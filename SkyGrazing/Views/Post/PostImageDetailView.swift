@@ -69,6 +69,7 @@ struct PostImageDetailView: View {
                 Spacer()
                 menu
             }
+            .padding(.top, 24) // OS の 閉じる / 最小化 / 最大化のボタンと被るので
             .font(.title2)
             .foregroundStyle(.white)
             .padding()
