@@ -151,6 +151,22 @@ struct BskyReplyRef: Codable {
     let root: BskyPostView?
     let parent: BskyPostView?
     let grandparentAuthor: BskyProfileViewBasic?
+
+    enum CodingKeys: String, CodingKey {
+        case root
+        case parent
+        case grandparentAuthor
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // root / parent は postView / notFoundPost / blockedPost の union。
+        // notFoundPost・blockedPost には cid が無く BskyPostView としてデコードできないため、
+        // その場合は nil として扱う。
+        root = try? container.decodeIfPresent(BskyPostView.self, forKey: .root)
+        parent = try? container.decodeIfPresent(BskyPostView.self, forKey: .parent)
+        grandparentAuthor = try container.decodeIfPresent(BskyProfileViewBasic.self, forKey: .grandparentAuthor)
+    }
 }
 
 // MARK: - app.bsky.feed.defs#reasonRepost / reasonPin
