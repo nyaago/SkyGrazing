@@ -9,11 +9,16 @@ import SwiftUI
 
 /// 投稿画像を全画面でポップアップ表示する View。
 /// 左上に閉じるボタン、右上に 3 点メニュー（Copy / Save / Share）を配置する。
+/// セルで読み込み済みのサムネイル `UIImage`（キャッシュ）を即座に表示しつつ、
+/// フルサイズ画像をバックグラウンドで読み込んで差し替える。
 struct PostImageDetailView: View {
     let image: BskyImage
 
     @Environment(\.dismiss) private var dismiss
     @GestureState private var dragOffset = CGSize.zero
+
+    /// フルサイズ画像の読み込みを管理するローダー。
+    @StateObject private var loader = ImageLoader()
 
     /// 全画面表示に使う URL。フルサイズを優先し、無ければサムネイルを使う。
     private var displayURL: URL? {
@@ -26,11 +31,27 @@ struct PostImageDetailView: View {
         return nil
     }
 
+    /// 読み込みに使う URL 文字列。フルサイズを優先する。
+    private var loadURLString: String? {
+        image.fullsize ?? image.thumb
+    }
+
+    /// 表示する画像。フルサイズ読み込み済みならそれを、未完了ならキャッシュ済みサムネイルを使う。
+    private var displayImage: UIImage? {
+        if let loaded = loader.image {
+            return loaded
+        }
+        if let thumb = image.thumb {
+            return ImageCache.shared.image(for: thumb)
+        }
+        return nil
+    }
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 Color.black.ignoresSafeArea()
-                
+
                 imageContent.background(Color.white)
                     .offset(y: dragOffset.height)
                     .gesture(
@@ -50,31 +71,25 @@ struct PostImageDetailView: View {
                 overlayControls
             }
         }
+        .task {
+            await loader.load(from: loadURLString)
+        }
     }
 
     /// 画面いっぱいに縦横比を維持して表示する画像本体。
     @ViewBuilder
     private var imageContent: some View {
-        if let url = displayURL {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                    case .success(let loaded):
-                        loaded
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    case .failure:
-                        Image(systemName: "photo")
-                            .font(.largeTitle)
-                            .foregroundStyle(.secondary)
-                    default:
-                        ProgressView()
-                            .tint(.white)
-                }
-            }
-        } else {
+        if let uiImage = displayImage {
+            Image(uiImage: uiImage)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        } else if case .failed = loader.state {
             Image(systemName: "photo")
                 .font(.largeTitle)
                 .foregroundStyle(.secondary)
+        } else {
+            ProgressView()
+                .tint(.white)
         }
     }
 
