@@ -13,6 +13,7 @@ struct PostImageDetailView: View {
     let image: BskyImage
 
     @Environment(\.dismiss) private var dismiss
+    @GestureState private var dragOffset = CGSize.zero
 
     /// 全画面表示に使う URL。フルサイズを優先し、無ければサムネイルを使う。
     private var displayURL: URL? {
@@ -26,12 +27,28 @@ struct PostImageDetailView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            imageContent
-
-            overlayControls
+        GeometryReader { geo in
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                imageContent.background(Color.white)
+                    .offset(y: dragOffset.height)
+                    .gesture(
+                        DragGesture()
+                            .updating($dragOffset) { value, state, _ in
+                                state = value.translation
+                            }
+                            .onEnded { value in
+                                let threshold: CGFloat = geo.size.height * 0.2
+                                // 1/5以上下にドラッグされたら閉じる
+                                if value.translation.height > threshold  ||
+                                        value.translation.height < -threshold {
+                                    dismiss()
+                                }
+                            }
+                    )
+                overlayControls
+            }
         }
     }
 
