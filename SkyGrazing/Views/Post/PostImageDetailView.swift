@@ -113,24 +113,32 @@ struct PostImageDetailView: View {
     /// 右上の 3 点メニュー。
     private var menu: some View {
         Menu {
-            Button {
-                print("Copy Image: \(displayURL?.absoluteString ?? "-")")
-            } label: {
-                Label("Copy Image", systemImage: "doc.on.doc")
+            if let image = displayImage {
+                Button {
+                    UIPasteboard.general.image = image
+                } label: {
+                    Label("Copy Image", systemImage: "doc.on.doc")
+                }
             }
-            Button {
-                print("Save Image: \(displayURL?.absoluteString ?? "-")")
-            } label: {
-                Label("Save Image", systemImage: "square.and.arrow.down")
+            if let image = displayImage {
+                Button {
+                    saveImage(uiImage: image)
+                } label: {
+                    Label("Save Image", systemImage: "square.and.arrow.down")
+                }
             }
-            Button {
-                print("Share: \(displayURL?.absoluteString ?? "-")")
-            } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
+            if let url = displayURL {
+                ShareLink(item: url) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
             }
         } label: {
             Image(systemName: "ellipsis.circle.fill")
                 .foregroundStyle(.secondary)
         }
+    }
+    
+    private func saveImage(uiImage: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
     }
 }
