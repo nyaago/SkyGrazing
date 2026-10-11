@@ -33,6 +33,7 @@ final class ImageLoader: ObservableObject {
 
     /// 指定した URL 文字列の画像を読み込む。
     /// キャッシュがあれば即座に使用し、無ければバックグラウンドでダウンロードして生成・キャッシュする。
+    /// (@MainActor がついているので メインスレッドで起動されるが、時間のかかる部分はバックグラウンドで実行される。
     func load(from urlString: String?) async {
         guard let urlString, let url = URL(string: urlString) else {
             state = .failed

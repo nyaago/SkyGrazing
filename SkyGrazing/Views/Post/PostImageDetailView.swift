@@ -41,12 +41,12 @@ struct PostImageDetailView: View {
         if let loaded = loader.image {
             return loaded
         }
-        if let thumb = image.thumb {
+        if let thumb = image.fullsize {
             return ImageCache.shared.image(for: thumb)
         }
         return nil
     }
-
+    
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -68,6 +68,7 @@ struct PostImageDetailView: View {
                                 }
                             }
                     )
+                    .padding(.top, geo.safeAreaInsets.top) // status bar に被らないようにする
                 overlayControls
             }
         }
