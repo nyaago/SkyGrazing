@@ -20,6 +20,11 @@ struct PostBodyView: View {
                     .modifier(BodyTextModifier())
             }
             .buttonStyle(.plain)
+
+            if let images = post.embed?.images, !images.isEmpty {
+                PostImagesView(images: images)
+                    .padding(.top, 4)
+            }
         }
         .openLinksInApp()
     }
