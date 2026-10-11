@@ -62,15 +62,32 @@ struct BskyPostView: Codable, Hashable {
 // MARK: - app.bsky.embed.images#view
 
 /// 投稿に添付された画像などの埋め込みコンテンツ。
-/// `$type` が `app.bsky.embed.images#view` の場合、`images` に画像一覧を持つ。
+/// `$type` が `app.bsky.embed.images#view` の場合は `images` に画像一覧を、
+/// `app.bsky.embed.external#view` の場合は `external` に外部リンク情報を持つ。
 struct BskyEmbed: Codable {
     let type: String?
     let images: [BskyImage]?
+    let external: BskyExternalView?
 
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case images
+        case external
     }
+}
+
+// MARK: - app.bsky.embed.external#view
+
+/// 外部リンク（記事など）の埋め込み情報。
+struct BskyExternalView: Codable {
+    /// 埋め込み元の URL。
+    let uri: String?
+    /// リンク先のタイトル。
+    let title: String?
+    /// リンク先の説明文。
+    let description: String?
+    /// サムネイル画像の URL。
+    let thumb: String?
 }
 
 // MARK: - app.bsky.embed.images#viewImage
