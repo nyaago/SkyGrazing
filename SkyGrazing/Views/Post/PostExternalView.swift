@@ -95,14 +95,15 @@ struct PostExternalView: View {
     private var information: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let domain {
-                Text(domain)
-                    .modifier(CaptionModifier())
+                HStack(spacing: 4) {
+                    Image(systemName: "link")
+                    Text(domain)
+                }
+                .modifier(CaptionModifier())
             }
             if let title = external.title, !title.isEmpty {
                 Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+                    .modifier(SubHeadlineModifier())
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
             }
