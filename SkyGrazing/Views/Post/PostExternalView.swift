@@ -23,11 +23,8 @@ struct PostExternalView: View {
     /// 基準幅を超えた場合に使用する横幅の割合。
     private let wideWidthRatio: CGFloat = 0.8
 
-
     /// 利用可能な横幅（計測値）。
     @State private var containerWidth: CGFloat = 0
-
-    
 
     private let cornerRadius: CGFloat = 10
 
@@ -47,23 +44,28 @@ struct PostExternalView: View {
                     }
                 }
 
-            Button(action: open) {
-                VStack(alignment: .leading, spacing: 0) {
-                    thumbnail
-                    information
-                }
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-                .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(Color(.separator), lineWidth: 0.5)
-                )
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: displayWidth, alignment: .leading)
+            layoutContent
+                .buttonStyle(.plain)
+                .frame(maxWidth: displayWidth, alignment: .leading)
         }
         .task {
             await loader.load(from: external.thumb)
+        }
+    }
+    
+    @ViewBuilder
+    private var layoutContent: some View {
+        Button(action: open) {
+            VStack(alignment: .leading, spacing: 0) {
+                thumbnail
+                information
+            }
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(Color(.separator), lineWidth: 0.5)
+            )
         }
     }
 
@@ -114,7 +116,6 @@ struct PostExternalView: View {
         guard containerWidth > wideThreshold else { return .infinity }
         return containerWidth * wideWidthRatio
     }
-
 
     /// リンク先 URL のドメイン（先頭の `www.` は除く）。
     private var domain: String? {
