@@ -21,17 +21,27 @@ class BskyService {
     /// GETリクエストを実行する
     func fetch<R: BskyRequestable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
-        let response = try await client.fetch(request: request)
-        try checkResponse(response)
-        return response
+        do {
+            let response = try await client.fetch(request: request)
+            try checkResponse(response)
+            return response
+        } catch BskyAuthError.sessionExpired {
+            await handleSessionExpired()
+            throw BskyAuthError.sessionExpired
+        }
     }
     
     /// POSTリクエストを実行する
     func post<R: BskyPostable>(_ request: R) async throws -> R.Response
         where R.Response: BskyResponseCheckable {
-        let response = try await client.post(request: request)
-        try checkResponse(response)
-        return response
+        do {
+            let response = try await client.post(request: request)
+            try checkResponse(response)
+            return response
+        } catch BskyAuthError.sessionExpired {
+            await handleSessionExpired()
+            throw BskyAuthError.sessionExpired
+        }
     }
     
     /// UI から identifier/password でログインする
@@ -64,5 +74,11 @@ class BskyService {
         client.logout()
         UserSettings.handle = ""
         isLoggedIn = false
+    }
+
+    /// refreshJwt も失効し再ログインが必要になったとき、ログアウト状態にして UI をログイン画面へ戻す。
+    @MainActor
+    private func handleSessionExpired() {
+        logout()
     }
 }
