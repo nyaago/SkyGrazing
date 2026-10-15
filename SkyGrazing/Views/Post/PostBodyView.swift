@@ -25,6 +25,11 @@ struct PostBodyView: View {
                 PostImagesView(images: images)
                     .padding(.top, 4)
             }
+
+            if let external = post.embed?.external {
+                PostExternalView(external: external)
+                    .padding(.top, 4)
+            }
         }
         .openLinksInApp()
     }
