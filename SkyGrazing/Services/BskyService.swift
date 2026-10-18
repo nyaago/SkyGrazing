@@ -73,7 +73,7 @@ class BskyService {
     func logout() {
         client.logout()
         UserSettings.handle = ""
-        isLoggedIn = false
+        isLoggedIn = false  /// このステータ値変更によって、ContentView での分岐で LoginView が表示される
     }
 
     /// refreshJwt も失効し再ログインが必要になったとき、ログアウト状態にして UI をログイン画面へ戻す。

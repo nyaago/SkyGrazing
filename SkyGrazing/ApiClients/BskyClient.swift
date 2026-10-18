@@ -239,16 +239,19 @@ class BskyClient {
 }
 
 /// refreshSession を直列化するコーディネータ。
-/// 同時に複数のリクエストが期限切れを検知しても、更新は 1 本にまとめて実行する。
+/// 複数のAPI 発行により、同時に複数のリクエストが期限切れを検知しても、更新は 1 本にまとめて実行する。
 private actor SessionRefreshCoordinator {
     private var inFlight: Task<Void, Error>?
 
     /// 既に更新中ならその完了を待ち、そうでなければ新たに更新を開始する。
+    /// operation = refresh 実際のrefresh処理を行うClosure。Task { } 内で実行するので @escaping
     func refresh(_ operation: @escaping () async throws -> Void) async throws {
         if let inFlight {
+            // 既に更新中
             try await inFlight.value
             return
         }
+        // 更新開始
         let task = Task { try await operation() }
         inFlight = task
         defer { inFlight = nil }
