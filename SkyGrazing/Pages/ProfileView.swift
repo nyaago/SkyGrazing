@@ -90,7 +90,10 @@ struct ProfileView: View {
         if let profile = viewModel.profile {
             let isOwner = profile.handle == UserSettings.handle
             switch selectedSection {
-            case .posts, .media, .feeds:
+            case .posts:
+                // Media / Feeds は仮で Posts と同じ扱い
+                postsFeed(for: profile, filter: "posts_no_replies")
+            case .media:
                 // Media / Feeds は仮で Posts と同じ扱い
                 postsFeed(for: profile, filter: "posts_no_replies")
             case .replies:
@@ -101,7 +104,9 @@ struct ProfileView: View {
                 } else {
                     // Likes は本人のみ表示。非本人の場合は Posts にフォールバック
                     postsFeed(for: profile, filter: "posts_no_replies")
-                }
+            //case .feeds:
+            //case .listz:
+            }
             }
         }
     }
