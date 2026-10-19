@@ -12,7 +12,8 @@ enum ProfileSection: String, CaseIterable {
     case replies = "Replies"
     case media = "Media"
     case likes = "Likes"
-    case feeds = "Feeds"
+    //case feeds = "Feeds"
+    //case feeds = "Lists"
 }
 
 struct ProfileSectionBarView: View {
