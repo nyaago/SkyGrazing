@@ -68,12 +68,31 @@ struct BskyEmbed: Codable {
     let type: String?
     let images: [BskyImage]?
     let external: BskyExternalView?
+    let video: BskyVideo?
 
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case images
         case external
+        case video
     }
+}
+
+// MARK: - app.bsky.embed.video#view
+
+/// 投稿に添付された動画の埋め込み情報。
+/// `$type` が `app.bsky.embed.video#view` の場合に `BskyEmbed.video` へ格納される。
+struct BskyVideo: Codable {
+    /// 動画コンテンツの CID。
+    let cid: String?
+    /// HLS 再生用プレイリスト（.m3u8）の URL。
+    let playlist: String?
+    /// サムネイル画像の URL。
+    let thumbnail: String?
+    /// 代替テキスト。
+    let alt: String?
+    /// 動画の縦横比。
+    let aspectRatio: BskyAspectRatio?
 }
 
 // MARK: - app.bsky.embed.external#view
