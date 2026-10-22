@@ -30,11 +30,6 @@ struct PostVideoDetailView: View {
             overlayControls
         }
         .onAppear {
-            // 共有プレイヤーの現在位置からそのまま再生を続ける。
-            //player.play()
-            if !player.currentTime().isValid {
-                player.seek(to: .zero)
-            }
         }
     }
 

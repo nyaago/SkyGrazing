@@ -48,7 +48,10 @@ struct PostVideoPlayerView: View {
                   let url = URL(string: playlist) else { return }
             player = AVPlayer(url: url)
 
-
+        }
+        .onReceive(NotificationCenter.default.publisher(
+                for: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)) { _ in
+            player?.seek(to: .zero)
         }
         .fullScreenCover(isPresented: $isPresentingFullScreen) {
             if let player {
