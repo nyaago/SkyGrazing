@@ -16,6 +16,9 @@ struct PostVideoPlayerView: View {
     /// 再生に使用するプレイヤー。プレイリスト URL から生成する。
     @State private var player: AVPlayer?
 
+    /// 全画面プレイヤーの表示状態。
+    @State private var isPresentingFullScreen = false
+
     private let cornerRadius: CGFloat = 10
 
     var body: some View {
@@ -34,12 +37,39 @@ struct PostVideoPlayerView: View {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(Color(.separator), lineWidth: 0.5)
         )
+        .overlay(alignment: .topTrailing) {
+            // VideoPlayer は自前のタッチを消費するため、全画面化は専用ボタンで行う。
+            expandButton
+                .padding(8)
+        }
         .onAppear {
             guard player == nil,
                   let playlist = video.playlist,
                   let url = URL(string: playlist) else { return }
             player = AVPlayer(url: url)
+
+
         }
+        .fullScreenCover(isPresented: $isPresentingFullScreen) {
+            if let player {
+                // インラインと同一のプレイヤーを渡し、再生位置・再生状態を共有する。
+                PostVideoDetailView(player: player)
+            }
+        }
+    }
+
+    /// 全画面表示を開くボタン。
+    private var expandButton: some View {
+        Button {
+            isPresentingFullScreen = true
+        } label: {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(8)
+                .background(.black.opacity(0.5), in: Circle())
+        }
+        .buttonStyle(.plain)
     }
 
     /// 動画の縦横比。情報が無い場合は 16:9 を既定とする。
