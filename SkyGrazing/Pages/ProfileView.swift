@@ -95,7 +95,7 @@ struct ProfileView: View {
                 postsFeed(for: profile, filter: "posts_no_replies")
             case .media:
                 // Media / Feeds は仮で Posts と同じ扱い
-                postsFeed(for: profile, filter: "posts_no_replies")
+                postsFeed(for: profile, filter: "posts_with_media")
             case .replies:
                 postsFeed(for: profile, filter: "posts_with_replies")
             case .likes:

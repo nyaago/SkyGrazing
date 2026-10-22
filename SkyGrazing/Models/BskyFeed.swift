@@ -64,16 +64,63 @@ struct BskyPostView: Codable, Hashable {
 /// 投稿に添付された画像などの埋め込みコンテンツ。
 /// `$type` が `app.bsky.embed.images#view` の場合は `images` に画像一覧を、
 /// `app.bsky.embed.external#view` の場合は `external` に外部リンク情報を持つ。
+/// `app.bsky.embed.video#view` の場合は動画情報が `embed` 直下に展開されるため、
+/// `cid` / `playlist` / `thumbnail` / `alt` / `aspectRatio` をこの型が直接保持する。
 struct BskyEmbed: Codable {
     let type: String?
     let images: [BskyImage]?
     let external: BskyExternalView?
 
+    /// 動画コンテンツの CID（`app.bsky.embed.video#view`）。
+    let cid: String?
+    /// HLS 再生用プレイリスト（.m3u8）の URL。
+    let playlist: String?
+    /// サムネイル画像の URL。
+    let thumbnail: String?
+    /// 動画の代替テキスト。
+    let alt: String?
+    /// 動画の縦横比。
+    let aspectRatio: BskyAspectRatio?
+
     enum CodingKeys: String, CodingKey {
         case type = "$type"
         case images
         case external
+        case cid
+        case playlist
+        case thumbnail
+        case alt
+        case aspectRatio
     }
+
+    /// `$type` が動画埋め込みの場合に、動画情報をまとめた `BskyVideo` を返す。
+    var video: BskyVideo? {
+        guard playlist != nil else { return nil }
+        return BskyVideo(
+            cid: cid,
+            playlist: playlist,
+            thumbnail: thumbnail,
+            alt: alt,
+            aspectRatio: aspectRatio
+        )
+    }
+}
+
+// MARK: - app.bsky.embed.video#view
+
+/// 投稿に添付された動画の埋め込み情報。
+/// レスポンス上は `embed` 直下に展開されるため、`BskyEmbed` の `video` 経由で取得する。
+struct BskyVideo {
+    /// 動画コンテンツの CID。
+    let cid: String?
+    /// HLS 再生用プレイリスト（.m3u8）の URL。
+    let playlist: String?
+    /// サムネイル画像の URL。
+    let thumbnail: String?
+    /// 代替テキスト。
+    let alt: String?
+    /// 動画の縦横比。
+    let aspectRatio: BskyAspectRatio?
 }
 
 // MARK: - app.bsky.embed.external#view

@@ -30,6 +30,11 @@ struct PostBodyView: View {
                 PostExternalView(external: external)
                     .padding(.top, 4)
             }
+
+            if let video = post.embed?.video {
+                PostVideoPlayerView(video: video)
+                    .padding(.top, 4)
+            }
         }
         .openLinksInApp()
     }

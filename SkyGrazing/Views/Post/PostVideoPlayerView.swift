@@ -1,0 +1,85 @@
+//
+//  PostVideoPlayerView.swift
+//  SkyGrazing
+//
+//  Created by nyaago on 2026/10/19.
+//
+
+import AVKit
+import SwiftUI
+
+/// 投稿に埋め込まれた動画（app.bsky.embed.video#view）を再生する View。
+/// HLS プレイリスト（.m3u8）を AVKit の `VideoPlayer` で再生する。
+struct PostVideoPlayerView: View {
+    let video: BskyVideo
+
+    /// 再生に使用するプレイヤー。プレイリスト URL から生成する。
+    @State private var player: AVPlayer?
+
+    /// 全画面プレイヤーの表示状態。
+    @State private var isPresentingFullScreen = false
+
+    private let cornerRadius: CGFloat = 10
+
+    var body: some View {
+        Group {
+            if let player {
+                VideoPlayer(player: player)
+                    .aspectRatio(aspectRatio, contentMode: .fit)
+            } else {
+                // プレイリスト URL が無効な場合のプレースホルダー。
+                Color.gray.opacity(0.1)
+                    .aspectRatio(aspectRatio, contentMode: .fit)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(Color(.separator), lineWidth: 0.5)
+        )
+        .overlay(alignment: .topTrailing) {
+            // VideoPlayer は自前のタッチを消費するため、全画面化は専用ボタンで行う。
+            expandButton
+                .padding(8)
+        }
+        .onAppear {
+            guard player == nil,
+                  let playlist = video.playlist,
+                  let url = URL(string: playlist) else { return }
+            player = AVPlayer(url: url)
+
+        }
+        .onReceive(NotificationCenter.default.publisher(
+                for: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)) { _ in
+            player?.seek(to: .zero)
+        }
+        .fullScreenCover(isPresented: $isPresentingFullScreen) {
+            if let player {
+                // インラインと同一のプレイヤーを渡し、再生位置・再生状態を共有する。
+                PostVideoDetailView(player: player)
+            }
+        }
+    }
+
+    /// 全画面表示を開くボタン。
+    private var expandButton: some View {
+        Button {
+            isPresentingFullScreen = true
+        } label: {
+            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(8)
+                .background(.black.opacity(0.5), in: Circle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// 動画の縦横比。情報が無い場合は 16:9 を既定とする。
+    private var aspectRatio: CGFloat {
+        guard let ratio = video.aspectRatio, ratio.height > 0 else {
+            return 16.0 / 9.0
+        }
+        return CGFloat(ratio.width) / CGFloat(ratio.height)
+    }
+}
