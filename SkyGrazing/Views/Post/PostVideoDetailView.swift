@@ -19,6 +19,7 @@ struct PostVideoDetailView: View {
     let player: AVPlayer
 
     @Environment(\.dismiss) private var dismiss
+    @GestureState private var dragOffset = CGSize.zero
 
     var body: some View {
         GeometryReader { geo in
@@ -27,6 +28,20 @@ struct PostVideoDetailView: View {
 
                 VideoPlayer(player: player)
                     .frame(height: videoPlayerHeight(geometry: geo))
+                    .gesture(
+                        DragGesture()
+                            .updating($dragOffset) { value, state, _ in
+                                state = value.translation
+                            }
+                            .onEnded { value in
+                                let threshold: CGFloat = geo.size.height * 0.2
+                                // 1/5以上下にドラッグされたら閉じる
+                                if value.translation.height > threshold  ||
+                                        value.translation.height < -threshold {
+                                    dismiss()
+                                }
+                            }
+                    )
 
                 overlayControls
                     .frame(height: videoPlayerHeight(geometry: geo))
