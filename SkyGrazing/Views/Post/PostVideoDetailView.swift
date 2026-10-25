@@ -21,18 +21,31 @@ struct PostVideoDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        GeometryReader { geo in
+            ZStack {
+                Color.black.ignoresSafeArea()
 
-            VideoPlayer(player: player)
-                .ignoresSafeArea()
+                VideoPlayer(player: player)
+                    .frame(height: videoPlayerHeight(geometry: geo))
 
-            overlayControls
-        }
-        .onAppear {
+                overlayControls
+                    .frame(height: videoPlayerHeight(geometry: geo))
+            }
+            .onAppear {
+            }
+
         }
     }
 
+    private func safeAreaHeight(geometry: GeometryProxy) -> CGFloat {
+        return geometry.safeAreaInsets.top + geometry.safeAreaInsets.bottom
+    }
+    
+    private func videoPlayerHeight(geometry: GeometryProxy) -> CGFloat {
+        let totalSafeAreaHeight = safeAreaHeight(geometry: geometry)
+        return geometry.size.height - totalSafeAreaHeight * 2
+    }
+    
     /// 左上の閉じるボタン。
     private var overlayControls: some View {
         VStack {
@@ -40,10 +53,9 @@ struct PostVideoDetailView: View {
                 CloseButtonView { dismiss() }
                 Spacer()
             }
-            .padding(.top, 24) // OS の 閉じる / 最小化 / 最大化のボタンと被るので
             .font(.title2)
             .foregroundStyle(.white)
-            .padding()
+            .padding(.leading, 64) // Video Player の 音声取得Controlがあるので
             Spacer()
         }
     }
