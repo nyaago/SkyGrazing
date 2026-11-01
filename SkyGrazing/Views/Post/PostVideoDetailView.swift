@@ -28,28 +28,34 @@ struct PostVideoDetailView: View {
 
                 VideoPlayer(player: player)
                     .frame(height: videoPlayerHeight(geometry: geo))
-                    .gesture(
-                        DragGesture()
-                            .updating($dragOffset) { value, state, _ in
-                                state = value.translation
-                            }
-                            .onEnded { value in
-                                let threshold: CGFloat = geo.size.height * 0.2
-                                // 1/5以上下にドラッグされたら閉じる
-                                if value.translation.height > threshold  ||
-                                        value.translation.height < -threshold {
-                                    dismiss()
-                                }
-                            }
-                    )
+                    .offset(y: videoOffset)
 
                 overlayControls
                     .frame(height: videoPlayerHeight(geometry: geo))
             }
+            .contentShape(Rectangle())
+            .simultaneousGesture(
+                DragGesture()
+                    .updating($dragOffset) { value, state, _ in
+                        state = value.translation
+                    }
+                    .onEnded { value in
+                        let threshold: CGFloat = geo.size.height * 0.2
+                        // 1/5以上上下にドラッグされたら閉じる
+                        if value.translation.height > threshold ||
+                                value.translation.height < -threshold {
+                            dismiss()
+                        }
+                    }
+            )
             .onAppear {
             }
 
         }
+    }
+    
+    private var videoOffset: CGFloat {
+        return dragOffset.height
     }
 
     private func safeAreaHeight(geometry: GeometryProxy) -> CGFloat {
