@@ -9,7 +9,9 @@ import SwiftUI
 
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var viewModel: ViewModel
+    @State private var isComposePresented = false
     
     init(viewModel: ViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -35,8 +37,25 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                 ProgressView()
             }
         }
+        .overlay(alignment: .bottomTrailing) {
+            composeButton
+                .padding()
+        }
+        // ボタン顔されたら 投稿作成のView (ComposePostView) を表示、
+        // 端末サイズによって fullScreenCover / sheet かを切り替え
+        .modifier(ResponsiveModalModifier(isPresented: $isComposePresented,
+                                          modalContent: ComposePostView.init))
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
+    }
+
+    /// 投稿画面を開くためのフローティングボタン。
+    private var composeButton: some View {
+        CircleIconButton(
+            action: {
+                isComposePresented = true
+            },
+            imageName: "square.and.pencil")
     }
 
     private func element(for post: FeedPostWrapper) -> some View {
