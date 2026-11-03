@@ -48,17 +48,11 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
 
     /// 投稿画面を開くためのフローティングボタン。
     private var composeButton: some View {
-        Button {
-            isComposePresented = true
-        } label: {
-            Image(systemName: "square.and.pencil")
-                .font(.title2)
-                .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
-                .background(Color.blue)
-                .clipShape(Circle())
-                .shadow(radius: 4)
-        }
+        CircleIconButton(
+            action: {
+                isComposePresented = true
+            },
+            imageName: "square.and.pencil")
     }
 
     private func element(for post: FeedPostWrapper) -> some View {
