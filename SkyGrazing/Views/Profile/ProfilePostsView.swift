@@ -19,7 +19,7 @@ struct ProfilePostsView: View {
     }
 
     private var postsCount: Int {
-        profile?.postCount ?? 0
+        profile?.postsCount ?? 0
     }
 }
 

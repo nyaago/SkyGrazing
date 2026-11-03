@@ -21,7 +21,7 @@ struct BskyProfile: Codable, BskyResponseCheckable {
     let banner: String?
     let followersCount: Int?
     let followsCount: Int?
-    let postCount: Int?
+    let postsCount: Int?
     let indexedAt: Date?
     let createdAt: Date?
     
