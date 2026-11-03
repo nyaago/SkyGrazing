@@ -34,6 +34,9 @@ struct PostVideoDetailView: View {
                     .frame(height: videoPlayerHeight(geometry: geo))
             }
             .contentShape(Rectangle())
+            // VideoPlayer内部に Gesture 認識器がある。
+            // それと共存させるための、VideoPlayer ではなくそのコンテナで
+            // かつ、gesture ではなく simultaneousGesture を使う
             .simultaneousGesture(
                 DragGesture()
                     .updating($dragOffset) { value, state, _ in
@@ -50,7 +53,6 @@ struct PostVideoDetailView: View {
             )
             .onAppear {
             }
-
         }
     }
     

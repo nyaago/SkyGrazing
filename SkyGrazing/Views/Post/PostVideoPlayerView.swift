@@ -32,13 +32,25 @@ struct PostVideoPlayerView: View {
                     .aspectRatio(aspectRatio, contentMode: .fit)
             }
         }
+        .simultaneousGesture(
+            // player 再生中の tap で 全画面化
+            TapGesture(count: 1)
+                .onEnded {
+                    guard let player else {
+                        return
+                    }
+                    if player.timeControlStatus == .playing {
+                        isPresentingFullScreen = true
+                    }
+                }
+            )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(Color(.separator), lineWidth: 0.5)
         )
         .overlay(alignment: .topTrailing) {
-            // VideoPlayer は自前のタッチを消費するため、全画面化は専用ボタンで行う。
+            // 再生中以外は、タッチで全画面化させるないので、専用ボタンで全画面化はで行えるように。
             expandButton
                 .padding(8)
         }
@@ -49,6 +61,7 @@ struct PostVideoPlayerView: View {
             player = AVPlayer(url: url)
 
         }
+        // 再生が終了に来たら、最初の位置に戻す
         .onReceive(NotificationCenter.default.publisher(
                 for: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)) { _ in
             player?.seek(to: .zero)
