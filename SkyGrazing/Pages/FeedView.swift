@@ -9,7 +9,9 @@ import SwiftUI
 
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var viewModel: ViewModel
+    @State private var isComposePresented = false
     
     init(viewModel: ViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -35,8 +37,28 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
                 ProgressView()
             }
         }
+        .overlay(alignment: .bottomTrailing) {
+            composeButton
+                .padding()
+        }
+        .modifier(ComposePresentationModifier(isPresented: $isComposePresented))
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
+    }
+
+    /// 投稿画面を開くためのフローティングボタン。
+    private var composeButton: some View {
+        Button {
+            isComposePresented = true
+        } label: {
+            Image(systemName: "square.and.pencil")
+                .font(.title2)
+                .foregroundStyle(.white)
+                .frame(width: 56, height: 56)
+                .background(Color.blue)
+                .clipShape(Circle())
+                .shadow(radius: 4)
+        }
     }
 
     private func element(for post: FeedPostWrapper) -> some View {
@@ -59,6 +81,24 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             return false
         }
         return index >= posts.count - 3
+    }
+}
+
+/// 投稿画面を iPhone(compact) では fullScreenCover、iPad(regular) では sheet で表示する。
+private struct ComposePresentationModifier: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Binding var isPresented: Bool
+
+    func body(content: Content) -> some View {
+        if horizontalSizeClass == .compact {
+            content.fullScreenCover(isPresented: $isPresented) {
+                ComposePostView()
+            }
+        } else {
+            content.sheet(isPresented: $isPresented) {
+                ComposePostView()
+            }
+        }
     }
 }
 
