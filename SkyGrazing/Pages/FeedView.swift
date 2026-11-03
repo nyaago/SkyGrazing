@@ -41,7 +41,10 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             composeButton
                 .padding()
         }
-        .modifier(ComposePresentationModifier(isPresented: $isComposePresented))
+        // ボタン顔されたら 投稿作成のView (ComposePostView) を表示、
+        // 端末サイズによって fullScreenCover / sheet かを切り替え
+        .modifier(ResponsiveModalModifier(isPresented: $isComposePresented,
+                                          modalContent: ComposePostView.init))
         .onAppear { viewModel.onAppear(service: service) }
         .onDisappear { viewModel.onDisappear() }
     }
@@ -75,24 +78,6 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             return false
         }
         return index >= posts.count - 3
-    }
-}
-
-/// 投稿画面を iPhone(compact) では fullScreenCover、iPad(regular) では sheet で表示する。
-private struct ComposePresentationModifier: ViewModifier {
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Binding var isPresented: Bool
-
-    func body(content: Content) -> some View {
-        if horizontalSizeClass == .compact {
-            content.fullScreenCover(isPresented: $isPresented) {
-                ComposePostView()
-            }
-        } else {
-            content.sheet(isPresented: $isPresented) {
-                ComposePostView()
-            }
-        }
     }
 }
 
