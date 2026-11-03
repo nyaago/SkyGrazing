@@ -87,6 +87,9 @@ struct FollowersView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 DisclosureArrowView()
             }
+            // .buttonStyle(.plain) の Button は描画されているView だけが tap 対象になるので
+            // 全体がGestureの判定対象になるように、contentShapeを追加
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
