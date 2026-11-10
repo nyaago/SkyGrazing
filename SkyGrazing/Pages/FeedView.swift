@@ -10,12 +10,32 @@ import SwiftUI
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
     @State private var viewModel: ViewModel
+    @State private var isComposePresented = false
     
     init(viewModel: ViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
 
     var body: some View {
+        ScrollViewReader { proxy in
+            listView
+            .overlay {
+                if viewModel.isLoading && viewModel.feedPosts.isEmpty {
+                    ProgressView()
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                postButton
+            }
+            .modifier(ResponsiveModalModifier(isPresented: $isComposePresented) {
+                ComposePostView(onPosted: { reloadAndScrollToTop(proxy: proxy) })
+            })
+            .onAppear { viewModel.onAppear(service: service) }
+            .onDisappear { viewModel.onDisappear() }
+        }
+    }
+
+    private var listView: some View {
         List(viewModel.displayPosts, id: \.post.cid) { displayPost in
             Group {
                 element(for: displayPost)
@@ -30,13 +50,24 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             
         }
         .listStyle(.plain)
-        .overlay {
-            if viewModel.isLoading && viewModel.feedPosts.isEmpty {
-                ProgressView()
+    }
+    
+    private var postButton: some View {
+        CircleIconButton(action: { isComposePresented = true },
+                         imageName: "square.and.pencil")
+            .padding()
+    }
+    
+    /// 投稿後に最新を読み込み、一番上の投稿までスクロールする。
+    private func reloadAndScrollToTop(proxy: ScrollViewProxy) {
+        Task {
+            await viewModel.reload(service: service)
+            if let topId = viewModel.displayPosts.first?.post.cid {
+                withAnimation {
+                    proxy.scrollTo(topId, anchor: .top)
+                }
             }
         }
-        .onAppear { viewModel.onAppear(service: service) }
-        .onDisappear { viewModel.onDisappear() }
     }
 
     private func element(for post: FeedPostWrapper) -> some View {

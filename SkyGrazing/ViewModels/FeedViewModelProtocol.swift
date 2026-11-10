@@ -16,6 +16,8 @@ protocol FeedViewModelProtocol: Observable, AnyObject {
     func onAppear(service: BskyService)
     func onDisappear()
     func loadMore(service: BskyService)
+    /// 最新の投稿を取得し直し、feedPosts を先頭から置き換える。
+    func reload(service: BskyService) async
 }
 extension FeedViewModelProtocol {
     var displayPosts: [FeedPostWrapper] {

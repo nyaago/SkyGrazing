@@ -76,6 +76,22 @@ where Request.Response == BskyFeedPage {
         }
     }
     
+    /// 最新の投稿を取得し、既存に無い投稿だけを先頭に追加する。投稿直後などに使用する。
+    @MainActor
+    func reload(service: BskyService) async {
+        isLoading = true
+        defer { isLoading = false }
+        let timeline = await fetchFeed(service: service, limit: limit, cursor: nil)
+        if let timeline {
+            let newPosts = (timeline.feed ?? []).filter { newPost in
+                !self.feedPosts.contains(where: { $0.post.cid == newPost.post.cid })
+            }
+            if !newPosts.isEmpty {
+                self.feedPosts.insert(contentsOf: newPosts, at: 0)
+            }
+        }
+    }
+
     // TODO 自動polling はやめて scroll で取りに行く、新しいpost の有無は監視して通知させるか?
     @MainActor
     private func startPolling(service: BskyService) {
