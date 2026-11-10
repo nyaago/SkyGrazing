@@ -9,7 +9,6 @@ import SwiftUI
 
 struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     @Environment(BskyService.self) private var service
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var viewModel: ViewModel
     @State private var isComposePresented = false
     
@@ -18,44 +17,49 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
     }
 
     var body: some View {
-        List(viewModel.displayPosts, id: \.post.cid) { displayPost in
-            Group {
-                element(for: displayPost)
+        ScrollViewReader { proxy in
+            List(viewModel.displayPosts, id: \.post.cid) { displayPost in
+                Group {
+                    element(for: displayPost)
+                }
+                .onAppear {
+                    if isNearBottom(displayPost) {
+                        viewModel.loadMore(service: service)
+                    }
+                }
+                .listRowSeparator(.visible, edges: .bottom)
+                .listRowSeparator(.hidden, edges: .top)
+                
             }
-            .onAppear {
-                if isNearBottom(displayPost) {
-                    viewModel.loadMore(service: service)
+            .listStyle(.plain)
+            .overlay {
+                if viewModel.isLoading && viewModel.feedPosts.isEmpty {
+                    ProgressView()
                 }
             }
-            .listRowSeparator(.visible, edges: .bottom)
-            .listRowSeparator(.hidden, edges: .top)
-            
-        }
-        .listStyle(.plain)
-        .overlay {
-            if viewModel.isLoading && viewModel.feedPosts.isEmpty {
-                ProgressView()
+            .overlay(alignment: .bottomTrailing) {
+                CircleIconButton(action: { isComposePresented = true },
+                                 imageName: "square.and.pencil")
+                    .padding()
             }
+            .modifier(ResponsiveModalModifier(isPresented: $isComposePresented) {
+                ComposePostView(onPosted: { reloadAndScrollToTop(proxy: proxy) })
+            })
+            .onAppear { viewModel.onAppear(service: service) }
+            .onDisappear { viewModel.onDisappear() }
         }
-        .overlay(alignment: .bottomTrailing) {
-            composeButton
-                .padding()
-        }
-        // ボタン顔されたら 投稿作成のView (ComposePostView) を表示、
-        // 端末サイズによって fullScreenCover / sheet かを切り替え
-        .modifier(ResponsiveModalModifier(isPresented: $isComposePresented,
-                                          modalContent: ComposePostView.init))
-        .onAppear { viewModel.onAppear(service: service) }
-        .onDisappear { viewModel.onDisappear() }
     }
 
-    /// 投稿画面を開くためのフローティングボタン。
-    private var composeButton: some View {
-        CircleIconButton(
-            action: {
-                isComposePresented = true
-            },
-            imageName: "square.and.pencil")
+    /// 投稿後に最新を読み込み、一番上の投稿までスクロールする。
+    private func reloadAndScrollToTop(proxy: ScrollViewProxy) {
+        Task {
+            await viewModel.reload(service: service)
+            if let topId = viewModel.displayPosts.first?.post.cid {
+                withAnimation {
+                    proxy.scrollTo(topId, anchor: .top)
+                }
+            }
+        }
     }
 
     private func element(for post: FeedPostWrapper) -> some View {

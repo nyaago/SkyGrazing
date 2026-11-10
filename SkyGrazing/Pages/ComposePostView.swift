@@ -10,6 +10,9 @@ import SwiftUI
 /// テキスト投稿を作成する画面。
 /// 1行のヘッダー・テキスト入力のボディ・1行のフッターで構成される。
 struct ComposePostView: View {
+    /// 投稿成功時に呼ばれるコールバック。画面を閉じる前に実行される。
+    var onPosted: (() -> Void)? = nil
+
     @Environment(BskyService.self) private var service
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = ComposePostViewModel()
@@ -53,6 +56,7 @@ struct ComposePostView: View {
                 Task {
                     let success = await viewModel.submit(service: service)
                     if success {
+                        onPosted?()
                         dismiss()
                     }
                 }

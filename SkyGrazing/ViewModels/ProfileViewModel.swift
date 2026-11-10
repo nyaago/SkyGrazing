@@ -80,6 +80,19 @@ class ProfileViewModel: FeedViewModelProtocol {
         }
     }
 
+    /// 最新の投稿を取得し直し、先頭から置き換える。投稿直後などに使用する。
+    @MainActor
+    func reload(service: BskyService) async {
+        isLoading = true
+        defer { isLoading = false }
+        let feed = await fetchFeed(service: service, limit: limit, cursor: nil)
+        if let feed {
+            self.feedPosts = feed.feed ?? []
+            self.cursor = feed.cursor
+            self.hasMore = feed.cursor != nil
+        }
+    }
+
     private func fetchProfile(service: BskyService) async -> BskyProfile? {
         guard let handle else {
             print("handle can't be nil")
