@@ -18,6 +18,8 @@ protocol FeedViewModelProtocol: Observable, AnyObject {
     func loadMore(service: BskyService)
     /// 最新の投稿を取得し直し、feedPosts を先頭から置き換える。
     func reload(service: BskyService) async
+    /// 投稿を削除し、成功したら feedPosts から取り除く。
+    func deletePost(_ post: BskyPostView, service: BskyService) async
 }
 extension FeedViewModelProtocol {
     var displayPosts: [FeedPostWrapper] {

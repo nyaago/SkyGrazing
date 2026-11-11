@@ -92,6 +92,19 @@ where Request.Response == BskyFeedPage {
         }
     }
 
+    /// 投稿を削除する。成功したら feedPosts から取り除く。
+    @MainActor
+    func deletePost(_ post: BskyPostView, service: BskyService) async {
+        guard let rkey = post.rkey else { return }
+        let request = BskyDeleteRecordRequest(repo: post.author.did, rkey: rkey)
+        do {
+            _ = try await service.post(request)
+            self.feedPosts.removeAll { $0.post.cid == post.cid }
+        } catch {
+            print("delete post error: \(error)")
+        }
+    }
+
     // TODO 自動polling はやめて scroll で取りに行く、新しいpost の有無は監視して通知させるか?
     @MainActor
     private func startPolling(service: BskyService) {

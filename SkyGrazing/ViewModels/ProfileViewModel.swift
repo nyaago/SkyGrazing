@@ -96,6 +96,19 @@ class ProfileViewModel: FeedViewModelProtocol {
         }
     }
 
+    /// 投稿を削除する。成功したら feedPosts から取り除く。
+    @MainActor
+    func deletePost(_ post: BskyPostView, service: BskyService) async {
+        guard let rkey = post.rkey else { return }
+        let request = BskyDeleteRecordRequest(repo: post.author.did, rkey: rkey)
+        do {
+            _ = try await service.post(request)
+            self.feedPosts.removeAll { $0.post.cid == post.cid }
+        } catch {
+            print("delete post error: \(error)")
+        }
+    }
+
     private func fetchProfile(service: BskyService) async -> BskyProfile? {
         guard let handle else {
             print("handle can't be nil")

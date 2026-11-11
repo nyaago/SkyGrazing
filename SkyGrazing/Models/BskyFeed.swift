@@ -50,6 +50,12 @@ struct BskyPostView: Codable, Hashable {
     let labels: [BskyLabel]?
     let embed: BskyEmbed?
 
+    /// AT URI（at://did/app.bsky.feed.post/rkey）末尾の rkey。
+    /// deleteRecord などレコード操作に用いる。
+    var rkey: String? {
+        uri.split(separator: "/").last.map(String.init)
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(cid)
     }
