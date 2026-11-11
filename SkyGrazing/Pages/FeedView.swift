@@ -75,12 +75,19 @@ struct FeedView<ViewModel: FeedViewModelProtocol>: View {
             // @todo: kind ごとに対応する View を実装して切り替える
             switch post {
                 case .regular:
-                    PostRowView(postContainer: post)
+                    PostRowView(postContainer: post, onDelete: { deletePost(post) })
                 case .reply:
-                    ReplyPostRowView(postContainer: post)
+                    ReplyPostRowView(postContainer: post, onDelete: { deletePost(post) })
                 case .repost:
-                    RepostRowView(postContainer: post)
+                    RepostRowView(postContainer: post, onDelete: { deletePost(post) })
             }
+        }
+    }
+
+    /// 投稿を削除し、List から取り除く。
+    private func deletePost(_ post: FeedPostWrapper) {
+        Task {
+            await viewModel.deletePost(post.post, service: service)
         }
     }
     

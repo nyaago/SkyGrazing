@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ReplyPostRowView: View {
     let postContainer: FeedPostWrapper
+    /// 投稿削除時の処理。
+    var onDelete: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -17,7 +19,7 @@ struct ReplyPostRowView: View {
                 ReplyToButtonView(parentAuthor: parentAuthor)
             }
             PostBodyView(post: postContainer.post)
-            PostFooterView(postContainer: postContainer)
+            PostFooterView(postContainer: postContainer, onDelete: onDelete)
         }
         .padding(.vertical, 4)
     }

@@ -12,7 +12,8 @@ struct CellActionButtonModifier: ViewModifier {
         content
             .font(.caption)
             .foregroundColor(.primary)
-            .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 6))
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
     }
 }
     
