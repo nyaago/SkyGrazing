@@ -21,6 +21,7 @@ struct PostMenuButtonView: View {
         } label: {
             Image(systemName: "ellipsis")
                 .modifier(CellActionButtonModifier())
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
