@@ -9,7 +9,12 @@ import SwiftUI
 
 struct PostFooterView: View {
     let postContainer: any BskyPostContainable
-    
+
+    /// ログイン中ユーザー自身の投稿かどうか。
+    private var isOwnPost: Bool {
+        postContainer.post.author.handle == UserSettings.handle
+    }
+
     var body: some View {
         HStack {
             ReplyCountButtonView(replyCount: postContainer.post.replyCount ?? 0)
@@ -18,6 +23,10 @@ struct PostFooterView: View {
                 .modifier(CellActionButtonModifier())
             LikeButtonView(likeCount: postContainer.post.likeCount ?? 0)
                 .modifier(CellActionButtonModifier())
+            if isOwnPost {
+                Spacer()
+                PostMenuButtonView()
+            }
         }
         .modifier(CellFooterModifier())
     }
