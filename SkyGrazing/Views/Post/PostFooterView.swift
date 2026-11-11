@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PostFooterView: View {
     let postContainer: any BskyPostContainable
+    /// 投稿削除時の処理。指定されたときだけ削除メニューを表示する。
+    var onDelete: (() -> Void)? = nil
 
     /// ログイン中ユーザー自身の投稿かどうか。
     private var isOwnPost: Bool {
@@ -23,9 +25,9 @@ struct PostFooterView: View {
                 .modifier(CellActionButtonModifier())
             LikeButtonView(likeCount: postContainer.post.likeCount ?? 0)
                 .modifier(CellActionButtonModifier())
-            if isOwnPost {
+            if isOwnPost, let onDelete {
                 Spacer()
-                PostMenuButtonView()
+                PostMenuButtonView(onDelete: onDelete)
             }
         }
         .modifier(CellFooterModifier())
